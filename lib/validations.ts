@@ -56,25 +56,4 @@ export const registerSchema = z
 
 export type RegisterFormData = z.infer<typeof registerSchema>;
 
-// ---------------------------------------------------------------------------
-// Admin — Add / Edit Product
-// ---------------------------------------------------------------------------
 
-export const addProductSchema = z.object({
-  name: z.string().min(2),
-  description: z.string().min(10),
-  category: z.enum([
-    'electrical-appliances',
-    'electronics',
-    'mobile-accessories',
-    'computer-accessories',
-    'chargers',
-    'earphones',
-    'smart-devices',
-  ]),
-  price: z.number().positive(),
-  stock: z.number().int().nonnegative(),
-  brand: z.string().min(1),
-});
-
-export type AddProductFormData = z.infer<typeof addProductSchema>;

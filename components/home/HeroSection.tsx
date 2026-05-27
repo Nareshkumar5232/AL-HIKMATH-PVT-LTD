@@ -20,20 +20,20 @@ const itemVariants: Variants = {
 
 export default function HeroSection() {
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F]">
+    <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-[#0F0F0F] dark:via-[#1A1A1A] dark:to-[#0F0F0F] transition-colors duration-300">
       {/* Animated background glow blobs */}
       <div
-        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-20 animate-pulse"
+        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl dark:opacity-20 opacity-6 animate-pulse"
         style={{ background: "#9EFF00" }}
         aria-hidden="true"
       />
       <div
-        className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl opacity-15 animate-pulse"
+        className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl dark:opacity-15 opacity-5 animate-pulse"
         style={{ background: "#00BFFF", animationDelay: "1s" }}
         aria-hidden="true"
       />
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-5 animate-pulse"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl dark:opacity-5 opacity-2 animate-pulse"
         style={{ background: "#9EFF00", animationDelay: "2s" }}
         aria-hidden="true"
       />
@@ -56,7 +56,7 @@ export default function HeroSection() {
           {/* Headline */}
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white leading-tight"
           >
             Premium Electrical &amp; Electronics{" "}
             <span className="text-[#9EFF00]">Appliances</span>
@@ -65,7 +65,7 @@ export default function HeroSection() {
           {/* Subheadline */}
           <motion.p
             variants={itemVariants}
-            className="max-w-2xl text-gray-400 text-base sm:text-lg leading-relaxed"
+            className="max-w-2xl text-gray-700 dark:text-gray-400 text-base sm:text-lg leading-relaxed"
           >
             Discover the finest collection of electrical and electronics products
             at AL HIKMATH ENTERPRISES PVT LTD — Chennai&apos;s trusted tech

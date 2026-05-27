@@ -1,21 +1,8 @@
-// AL HIKMATH ENTERPRISES PVT LTD — Mock Data
-// Validates: Requirements 4.4, 4.5, 4.8, 4.9
-
-import type {
-  Product,
-  Testimonial,
-  Order,
-  Customer,
-  Brand,
-  SalesDataPoint,
-  AdminStats,
-  ProductCategory,
-} from '@/types';
-
-// ─── PRODUCTS ────────────────────────────────────────────────────────────────
+import type { Product } from '@/types';
 
 export const mockProducts: Product[] = [
-  // ── electrical-appliances ──────────────────────────────────────────────────
+    // Paste the mockProducts array from lib/mock-data.ts here
+    // ── electrical-appliances ──────────────────────────────────────────────────
   {
     id: 'prod-001',
     slug: 'havells-led-bulb-9w',
@@ -28,8 +15,8 @@ export const mockProducts: Product[] = [
     category: 'electrical-appliances',
     brand: 'Havells',
     images: [
-      '/images/products/havells-led-bulb-9w-1.jpg',
-      '/images/products/havells-led-bulb-9w-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.5,
     reviewCount: 312,
@@ -58,8 +45,8 @@ export const mockProducts: Product[] = [
     category: 'electrical-appliances',
     brand: 'Syska',
     images: [
-      '/images/products/syska-extension-board-1.jpg',
-      '/images/products/syska-extension-board-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.3,
     reviewCount: 187,
@@ -88,9 +75,9 @@ export const mockProducts: Product[] = [
     category: 'electrical-appliances',
     brand: 'Havells',
     images: [
-      '/images/products/havells-ceiling-fan-1.jpg',
-      '/images/products/havells-ceiling-fan-2.jpg',
-      '/images/products/havells-ceiling-fan-3.jpg',
+      '/file.svg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.6,
     reviewCount: 245,
@@ -120,9 +107,9 @@ export const mockProducts: Product[] = [
     category: 'electronics',
     brand: 'Samsung',
     images: [
-      '/images/products/samsung-43-tv-1.jpg',
-      '/images/products/samsung-43-tv-2.jpg',
-      '/images/products/samsung-43-tv-3.jpg',
+      '/file.svg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.7,
     reviewCount: 892,
@@ -151,8 +138,8 @@ export const mockProducts: Product[] = [
     category: 'electronics',
     brand: 'Sony',
     images: [
-      '/images/products/sony-srs-xb23-1.jpg',
-      '/images/products/sony-srs-xb23-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.5,
     reviewCount: 634,
@@ -181,8 +168,8 @@ export const mockProducts: Product[] = [
     category: 'electronics',
     brand: 'TP-Link',
     images: [
-      '/images/products/tp-link-ax23-1.jpg',
-      '/images/products/tp-link-ax23-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.4,
     reviewCount: 421,
@@ -212,8 +199,8 @@ export const mockProducts: Product[] = [
     category: 'mobile-accessories',
     brand: 'Spigen',
     images: [
-      '/images/products/spigen-iphone15-case-1.jpg',
-      '/images/products/spigen-iphone15-case-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.6,
     reviewCount: 1023,
@@ -242,8 +229,8 @@ export const mockProducts: Product[] = [
     category: 'mobile-accessories',
     brand: 'Baseus',
     images: [
-      '/images/products/samsung-s24-screen-protector-1.jpg',
-      '/images/products/samsung-s24-screen-protector-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.2,
     reviewCount: 567,
@@ -272,8 +259,8 @@ export const mockProducts: Product[] = [
     category: 'mobile-accessories',
     brand: 'Realme',
     images: [
-      '/images/products/realme-powerbank-65w-1.jpg',
-      '/images/products/realme-powerbank-65w-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.5,
     reviewCount: 389,
@@ -303,9 +290,9 @@ export const mockProducts: Product[] = [
     category: 'computer-accessories',
     brand: 'Keychron',
     images: [
-      '/images/products/keychron-k2-1.jpg',
-      '/images/products/keychron-k2-2.jpg',
-      '/images/products/keychron-k2-3.jpg',
+      '/file.svg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.8,
     reviewCount: 712,
@@ -334,8 +321,8 @@ export const mockProducts: Product[] = [
     category: 'computer-accessories',
     brand: 'Logitech',
     images: [
-      '/images/products/logitech-g502-1.jpg',
-      '/images/products/logitech-g502-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.7,
     reviewCount: 1456,
@@ -364,8 +351,8 @@ export const mockProducts: Product[] = [
     category: 'computer-accessories',
     brand: 'Anker',
     images: [
-      '/images/products/anker-usb-hub-1.jpg',
-      '/images/products/anker-usb-hub-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.5,
     reviewCount: 834,
@@ -394,8 +381,8 @@ export const mockProducts: Product[] = [
     category: 'computer-accessories',
     brand: 'Dell',
     images: [
-      '/images/products/dell-s2722dc-1.jpg',
-      '/images/products/dell-s2722dc-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.6,
     reviewCount: 298,
@@ -425,8 +412,8 @@ export const mockProducts: Product[] = [
     category: 'chargers',
     brand: 'Baseus',
     images: [
-      '/images/products/baseus-65w-gan-1.jpg',
-      '/images/products/baseus-65w-gan-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.6,
     reviewCount: 923,
@@ -455,8 +442,8 @@ export const mockProducts: Product[] = [
     category: 'chargers',
     brand: 'Samsung',
     images: [
-      '/images/products/samsung-wireless-charger-1.jpg',
-      '/images/products/samsung-wireless-charger-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.4,
     reviewCount: 541,
@@ -486,8 +473,8 @@ export const mockProducts: Product[] = [
     category: 'earphones',
     brand: 'OnePlus',
     images: [
-      '/images/products/oneplus-nord-buds2-1.jpg',
-      '/images/products/oneplus-nord-buds2-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.4,
     reviewCount: 1102,
@@ -516,8 +503,8 @@ export const mockProducts: Product[] = [
     category: 'earphones',
     brand: 'Boult Audio',
     images: [
-      '/images/products/boult-bassbuds-1.jpg',
-      '/images/products/boult-bassbuds-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.1,
     reviewCount: 2341,
@@ -547,9 +534,9 @@ export const mockProducts: Product[] = [
     category: 'smart-devices',
     brand: 'Realme',
     images: [
-      '/images/products/realme-watch3pro-1.jpg',
-      '/images/products/realme-watch3pro-2.jpg',
-      '/images/products/realme-watch3pro-3.jpg',
+      '/file.svg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.3,
     reviewCount: 678,
@@ -578,8 +565,8 @@ export const mockProducts: Product[] = [
     category: 'smart-devices',
     brand: 'Syska',
     images: [
-      '/images/products/syska-smart-bulb-1.jpg',
-      '/images/products/syska-smart-bulb-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.2,
     reviewCount: 445,
@@ -608,8 +595,8 @@ export const mockProducts: Product[] = [
     category: 'smart-devices',
     brand: 'Philips',
     images: [
-      '/images/products/philips-smart-plug-1.jpg',
-      '/images/products/philips-smart-plug-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.4,
     reviewCount: 312,
@@ -638,8 +625,8 @@ export const mockProducts: Product[] = [
     category: 'computer-accessories',
     brand: 'LG',
     images: [
-      '/images/products/lg-32fhd-monitor-1.jpg',
-      '/images/products/lg-32fhd-monitor-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.5,
     reviewCount: 534,
@@ -668,8 +655,8 @@ export const mockProducts: Product[] = [
     category: 'electrical-appliances',
     brand: 'Bosch',
     images: [
-      '/images/products/bosch-table-fan-1.jpg',
-      '/images/products/bosch-table-fan-2.jpg',
+      '/file.svg',
+      '/file.svg',
     ],
     rating: 4.3,
     reviewCount: 198,
@@ -687,284 +674,3 @@ export const mockProducts: Product[] = [
     createdAt: '2024-04-05T08:00:00.000Z',
   },
 ];
-
-// ─── TESTIMONIALS ─────────────────────────────────────────────────────────────
-
-export const mockTestimonials: Testimonial[] = [
-  {
-    id: 'test-001',
-    name: 'Arjun Krishnamurthy',
-    role: 'Software Engineer, Chennai',
-    content:
-      'AL HIKMATH has been my go-to store for all electronics. The Keychron keyboard I bought arrived the next day and the quality is exactly as described. Excellent service!',
-    rating: 5,
-    avatar: '/images/avatars/arjun.jpg',
-  },
-  {
-    id: 'test-002',
-    name: 'Priya Subramaniam',
-    role: 'Interior Designer, Anna Nagar',
-    content:
-      'Ordered the Havells ceiling fan and the Syska smart bulbs together. Both were delivered promptly and the installation guide was very helpful. Will definitely order again.',
-    rating: 5,
-    avatar: '/images/avatars/priya.jpg',
-  },
-  {
-    id: 'test-003',
-    name: 'Mohammed Farhan',
-    role: 'Business Owner, T. Nagar',
-    content:
-      'Bought 10 extension boards for my office. Got a bulk discount and the delivery was on time. The products are genuine and the after-sales support is top-notch.',
-    rating: 4,
-    avatar: '/images/avatars/farhan.jpg',
-  },
-  {
-    id: 'test-004',
-    name: 'Deepa Venkataraman',
-    role: 'Teacher, Adyar',
-    content:
-      'The Samsung Smart TV I purchased is fantastic. The picture quality is stunning and setup was easy. AL HIKMATH offered the best price I found anywhere in Chennai.',
-    rating: 5,
-    avatar: '/images/avatars/deepa.jpg',
-  },
-  {
-    id: 'test-005',
-    name: 'Karthik Rajan',
-    role: 'Freelance Photographer, Velachery',
-    content:
-      'The Dell monitor is perfect for my photo editing work. Colours are accurate and the USB-C connectivity is very convenient. Highly recommend AL HIKMATH for computer accessories.',
-    rating: 5,
-    avatar: '/images/avatars/karthik.jpg',
-  },
-  {
-    id: 'test-006',
-    name: 'Lakshmi Narayanan',
-    role: 'Homemaker, Mylapore',
-    content:
-      'Ordered the Philips smart plug and the Syska smart bulb. The setup with Alexa was seamless. Great products at reasonable prices. The team was very helpful over the phone.',
-    rating: 4,
-    avatar: '/images/avatars/lakshmi.jpg',
-  },
-];
-
-// ─── CUSTOMERS ────────────────────────────────────────────────────────────────
-
-export const mockCustomers: Customer[] = [
-  {
-    id: 'cust-001',
-    name: 'Arjun Krishnamurthy',
-    email: 'arjun.k@example.com',
-    registeredAt: '2023-06-15T10:30:00.000Z',
-    totalOrders: 8,
-  },
-  {
-    id: 'cust-002',
-    name: 'Priya Subramaniam',
-    email: 'priya.s@example.com',
-    registeredAt: '2023-08-22T14:00:00.000Z',
-    totalOrders: 5,
-  },
-  {
-    id: 'cust-003',
-    name: 'Mohammed Farhan',
-    email: 'farhan.m@example.com',
-    registeredAt: '2023-09-10T09:15:00.000Z',
-    totalOrders: 12,
-  },
-  {
-    id: 'cust-004',
-    name: 'Deepa Venkataraman',
-    email: 'deepa.v@example.com',
-    registeredAt: '2023-11-05T11:45:00.000Z',
-    totalOrders: 3,
-  },
-  {
-    id: 'cust-005',
-    name: 'Karthik Rajan',
-    email: 'karthik.r@example.com',
-    registeredAt: '2024-01-18T16:20:00.000Z',
-    totalOrders: 6,
-  },
-  {
-    id: 'cust-006',
-    name: 'Lakshmi Narayanan',
-    email: 'lakshmi.n@example.com',
-    registeredAt: '2024-02-03T08:00:00.000Z',
-    totalOrders: 4,
-  },
-  {
-    id: 'cust-007',
-    name: 'Suresh Babu',
-    email: 'suresh.b@example.com',
-    registeredAt: '2024-02-20T13:30:00.000Z',
-    totalOrders: 2,
-  },
-  {
-    id: 'cust-008',
-    name: 'Anitha Selvam',
-    email: 'anitha.s@example.com',
-    registeredAt: '2024-03-12T10:00:00.000Z',
-    totalOrders: 1,
-  },
-];
-
-// ─── ORDERS ───────────────────────────────────────────────────────────────────
-
-export const mockOrders: Order[] = [
-  {
-    id: 'ord-001',
-    customerId: 'cust-001',
-    customerName: 'Arjun Krishnamurthy',
-    items: [
-      { product: mockProducts[9], quantity: 1 },  // Keychron K2
-      { product: mockProducts[10], quantity: 1 }, // Logitech G502
-    ],
-    subtotal: 12498,
-    tax: 2249,
-    total: 14747,
-    status: 'delivered',
-    createdAt: '2024-03-01T10:00:00.000Z',
-  },
-  {
-    id: 'ord-002',
-    customerId: 'cust-002',
-    customerName: 'Priya Subramaniam',
-    items: [
-      { product: mockProducts[2], quantity: 1 },  // Havells Ceiling Fan
-      { product: mockProducts[18], quantity: 3 }, // Syska Smart Bulb
-    ],
-    subtotal: 5896,
-    tax: 1061,
-    total: 6957,
-    status: 'delivered',
-    createdAt: '2024-03-10T14:30:00.000Z',
-  },
-  {
-    id: 'ord-003',
-    customerId: 'cust-003',
-    customerName: 'Mohammed Farhan',
-    items: [
-      { product: mockProducts[1], quantity: 10 }, // Syska Extension Board
-    ],
-    subtotal: 6490,
-    tax: 1168,
-    total: 7658,
-    status: 'shipped',
-    createdAt: '2024-04-02T09:00:00.000Z',
-  },
-  {
-    id: 'ord-004',
-    customerId: 'cust-004',
-    customerName: 'Deepa Venkataraman',
-    items: [
-      { product: mockProducts[3], quantity: 1 },  // Samsung 43" TV
-    ],
-    subtotal: 34999,
-    tax: 6299,
-    total: 41298,
-    status: 'processing',
-    createdAt: '2024-04-10T16:00:00.000Z',
-  },
-  {
-    id: 'ord-005',
-    customerId: 'cust-005',
-    customerName: 'Karthik Rajan',
-    items: [
-      { product: mockProducts[12], quantity: 1 }, // Dell 27" Monitor
-      { product: mockProducts[11], quantity: 1 }, // Anker USB-C Hub
-    ],
-    subtotal: 27998,
-    tax: 5039,
-    total: 33037,
-    status: 'pending',
-    createdAt: '2024-04-15T11:20:00.000Z',
-  },
-  {
-    id: 'ord-006',
-    customerId: 'cust-006',
-    customerName: 'Lakshmi Narayanan',
-    items: [
-      { product: mockProducts[19], quantity: 2 }, // Philips Smart Plug
-      { product: mockProducts[18], quantity: 2 }, // Syska Smart Bulb
-    ],
-    subtotal: 4196,
-    tax: 755,
-    total: 4951,
-    status: 'cancelled',
-    createdAt: '2024-04-08T08:45:00.000Z',
-  },
-];
-
-// ─── BRANDS ───────────────────────────────────────────────────────────────────
-
-export const mockBrands: Brand[] = [
-  { id: 'brand-001', name: 'Samsung', logo: '/images/brands/samsung.svg', website: 'https://www.samsung.com/in/' },
-  { id: 'brand-002', name: 'Apple', logo: '/images/brands/apple.svg', website: 'https://www.apple.com/in/' },
-  { id: 'brand-003', name: 'Sony', logo: '/images/brands/sony.svg', website: 'https://www.sony.co.in/' },
-  { id: 'brand-004', name: 'LG', logo: '/images/brands/lg.svg', website: 'https://www.lg.com/in/' },
-  { id: 'brand-005', name: 'Philips', logo: '/images/brands/philips.svg', website: 'https://www.philips.co.in/' },
-  { id: 'brand-006', name: 'Bosch', logo: '/images/brands/bosch.svg', website: 'https://www.bosch-home.com/in/' },
-  { id: 'brand-007', name: 'Havells', logo: '/images/brands/havells.svg', website: 'https://www.havells.com/' },
-  { id: 'brand-008', name: 'Syska', logo: '/images/brands/syska.svg', website: 'https://www.syska.in/' },
-  { id: 'brand-009', name: 'Realme', logo: '/images/brands/realme.svg', website: 'https://www.realme.com/in/' },
-  { id: 'brand-010', name: 'OnePlus', logo: '/images/brands/oneplus.svg', website: 'https://www.oneplus.in/' },
-  { id: 'brand-011', name: 'Logitech', logo: '/images/brands/logitech.svg', website: 'https://www.logitech.com/en-in/' },
-  { id: 'brand-012', name: 'Anker', logo: '/images/brands/anker.svg', website: 'https://www.anker.com/' },
-];
-
-// ─── SALES DATA ───────────────────────────────────────────────────────────────
-
-export const mockSalesData: SalesDataPoint[] = [
-  { month: 'Jan 2024', revenue: 182500, orders: 48 },
-  { month: 'Feb 2024', revenue: 215000, orders: 57 },
-  { month: 'Mar 2024', revenue: 198000, orders: 52 },
-  { month: 'Apr 2024', revenue: 243000, orders: 64 },
-  { month: 'May 2024', revenue: 267500, orders: 71 },
-  { month: 'Jun 2024', revenue: 231000, orders: 61 },
-  { month: 'Jul 2024', revenue: 289000, orders: 76 },
-  { month: 'Aug 2024', revenue: 312000, orders: 82 },
-  { month: 'Sep 2024', revenue: 278500, orders: 73 },
-  { month: 'Oct 2024', revenue: 345000, orders: 91 },
-  { month: 'Nov 2024', revenue: 421000, orders: 111 },
-  { month: 'Dec 2024', revenue: 398000, orders: 105 },
-];
-
-// ─── ADMIN STATS ──────────────────────────────────────────────────────────────
-
-export const mockAdminStats: AdminStats = {
-  totalRevenue: 3380500,
-  totalOrders: 891,
-  totalProducts: mockProducts.length,
-  totalCustomers: mockCustomers.length,
-};
-
-// ─── DERIVED / HELPER EXPORTS ─────────────────────────────────────────────────
-
-/** Products where isFeatured === true */
-export const featuredProducts: Product[] = mockProducts.filter(
-  (p) => p.isFeatured,
-);
-
-/**
- * Returns the product matching the given slug, or undefined if not found.
- */
-export function getProductBySlug(slug: string): Product | undefined {
-  return mockProducts.find((p) => p.slug === slug);
-}
-
-/**
- * Returns all products belonging to the given category.
- */
-export function getProductsByCategory(category: ProductCategory): Product[] {
-  return mockProducts.filter((p) => p.category === category);
-}
-
-/**
- * Returns up to `limit` products from the same category as `product`,
- * excluding the product itself. Defaults to 4.
- */
-export function getRelatedProducts(product: Product, limit = 4): Product[] {
-  return mockProducts
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, limit);
-}

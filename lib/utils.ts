@@ -26,6 +26,10 @@ export function formatPrice(amount: number): string {
 }
 
 /**
+ * Alias for `formatPrice` used across the codebase as `formatCurrency`.
+ */
+export const formatCurrency = formatPrice
+/**
  * Computes the subtotal for a list of cart items.
  * Returns 0 for an empty array.
  */

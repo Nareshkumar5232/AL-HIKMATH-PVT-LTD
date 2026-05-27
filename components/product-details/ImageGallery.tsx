@@ -14,8 +14,8 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
   const [mainError, setMainError] = useState(false);
 
   const mainSrc = mainError
-    ? "/images/placeholder.jpg"
-    : (images[activeIndex] ?? "/images/placeholder.jpg");
+    ? "/file.svg"
+    : (images[activeIndex] ?? "/file.svg");
 
   return (
     <div className="flex flex-col gap-4">
@@ -77,7 +77,7 @@ function ThumbnailButton({ src, alt, isActive, onClick }: ThumbnailButtonProps) 
       aria-label={alt}
     >
       <Image
-        src={error ? "/images/placeholder.jpg" : src}
+        src={error ? "/file.svg" : src}
         alt={alt}
         width={80}
         height={80}

@@ -4,112 +4,78 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
-import { featuredProducts } from "@/lib/mock-data";
+import { mockProducts } from "@/data/products";
 import { useCartStore } from "@/store/cartStore";
-import { formatPrice } from "@/lib/utils";
+import { useCategoryStore } from "@/store/categoryStore";
+import { formatCurrency, getDiscountPercentage } from "@/lib/utils";
+import { ProductCard } from "@/components/products/ProductCard";
 import type { Product } from "@/types";
 
-function ProductCard({ product }: { product: Product }) {
-  const addItem = useCartStore((s) => s.addItem);
-
-  function handleAddToCart() {
-    addItem(product);
-    toast.success(`${product.name} added to cart!`);
-  }
-
-  return (
-    <div className="glass-card flex-shrink-0 w-[260px] sm:w-[280px] flex flex-col overflow-hidden">
-      {/* Product image */}
-      <div className="relative w-full h-[200px] bg-[#1A1A1A] overflow-hidden">
-        <Image
-          src={product.images[0] ?? "/images/placeholder.jpg"}
-          alt={product.name}
-          width={280}
-          height={280}
-          className="object-cover w-full h-full"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = "/images/placeholder.jpg";
-          }}
-        />
-        {product.originalPrice && product.originalPrice > product.price && (
-          <span className="absolute top-2 left-2 bg-[#9EFF00] text-black text-xs font-bold px-2 py-0.5 rounded-full">
-            {Math.round(
-              ((product.originalPrice - product.price) / product.originalPrice) *
-                100
-            )}
-            % OFF
-          </span>
-        )}
-      </div>
-
-      {/* Product info */}
-      <div className="flex flex-col gap-3 p-4 flex-1">
-        <div>
-          <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">
-            {product.brand}
-          </p>
-          <h3 className="text-white text-sm font-semibold leading-snug line-clamp-2">
-            {product.name}
-          </h3>
-        </div>
-
-        <div className="flex items-baseline gap-2 mt-auto">
-          <span className="text-[#9EFF00] font-bold text-base">
-            {formatPrice(product.price)}
-          </span>
-          {product.originalPrice && product.originalPrice > product.price && (
-            <span className="text-gray-500 text-xs line-through">
-              {formatPrice(product.originalPrice)}
-            </span>
-          )}
-        </div>
-
-        <button
-          onClick={handleAddToCart}
-          className="flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-[#9EFF00] text-black text-sm font-semibold hover:bg-[#9EFF00]/90 transition-colors duration-200"
-        >
-          <ShoppingCart className="w-4 h-4" aria-hidden="true" />
-          Add to Cart
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function FeaturedProducts() {
+  const { selectedCategory } = useCategoryStore();
+
+  const displayProducts = selectedCategory
+    ? mockProducts.filter((p) => p.category === selectedCategory)
+    : mockProducts.filter((p) => p.isFeatured);
+
   return (
-    <section className="py-20 px-4 bg-[#0F0F0F]">
+    <section id="dynamic-products" className="py-20 px-4 bg-gray-50 dark:bg-[#0F0F0F] transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         {/* Section heading */}
         <motion.div
+          key={selectedCategory || "featured"}
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="mb-10"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
-            Featured{" "}
-            <span className="text-[#9EFF00] border-b-2 border-[#9EFF00] pb-0.5">
-              Products
-            </span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+            {selectedCategory ? (
+              <>
+                <span className="capitalize">{selectedCategory.replace(/-/g, " ")}</span>{" "}
+                <span className="text-[#9EFF00] border-b-2 border-[#9EFF00] pb-0.5">
+                  Products
+                </span>
+              </>
+            ) : (
+              <>
+                Featured{" "}
+                <span className="text-[#9EFF00] border-b-2 border-[#9EFF00] pb-0.5">
+                  Products
+                </span>
+              </>
+            )}
           </h2>
-          <p className="text-gray-400 mt-2">
-            Hand-picked top products from our collection.
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            {selectedCategory
+              ? `Check out the latest ${selectedCategory.replace(/-/g, " ")}.`
+              : "Hand-picked top products from our collection."}
           </p>
         </motion.div>
 
-        {/* Horizontal scroll carousel */}
+        {/* Dynamic Grid */}
         <motion.div
+          key={`grid-${selectedCategory || "featured"}`}
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {displayProducts.map((product, index) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <ProductCard product={product} />
+            </motion.div>
           ))}
+          {displayProducts.length === 0 && (
+            <div className="col-span-full py-12 text-center text-gray-500">
+              No products found for this category.
+            </div>
+          )}
         </motion.div>
       </div>
     </section>

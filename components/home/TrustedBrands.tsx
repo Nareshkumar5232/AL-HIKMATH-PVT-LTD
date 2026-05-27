@@ -1,4 +1,4 @@
-import { mockBrands } from "@/lib/mock-data";
+import { mockProducts } from "@/data/products";
 
 export default function TrustedBrands() {
   return (
@@ -36,23 +36,23 @@ export default function TrustedBrands() {
         />
 
         <div className="flex gap-6 brands-scroll">
-          {/* First copy */}
-          {mockBrands.map((brand) => (
+          {/* derive unique brands from products */}
+          {Array.from(new Set(mockProducts.map((p) => p.brand))).map((name, i) => (
             <div
-              key={`a-${brand.id}`}
+              key={`a-${i}`}
               className="flex-shrink-0 px-6 py-3 glass-card rounded-full text-white text-sm font-medium whitespace-nowrap"
             >
-              {brand.name}
+              {name}
             </div>
           ))}
-          {/* Second copy for seamless loop */}
-          {mockBrands.map((brand) => (
+          {/* second copy */}
+          {Array.from(new Set(mockProducts.map((p) => p.brand))).map((name, i) => (
             <div
-              key={`b-${brand.id}`}
+              key={`b-${i}`}
               className="flex-shrink-0 px-6 py-3 glass-card rounded-full text-white text-sm font-medium whitespace-nowrap"
               aria-hidden="true"
             >
-              {brand.name}
+              {name}
             </div>
           ))}
         </div>

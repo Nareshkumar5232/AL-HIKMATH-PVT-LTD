@@ -148,30 +148,43 @@
 
 /* ── Glassmorphism ── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 16px;
+}
+
+.dark .glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* ── Neon Glow Utilities ── */
 .neon-hover:hover {
-  box-shadow: 0 0 20px rgba(158, 255, 0, 0.4);
-  border-color: #9EFF00;
+  box-shadow: 0 0 12px rgba(158, 255, 0, 0.18);
+  border-color: rgba(158, 255, 0, 0.6);
 }
 
 .neon-blue-hover:hover {
-  box-shadow: 0 0 20px rgba(0, 191, 255, 0.4);
-  border-color: #00BFFF;
+  box-shadow: 0 0 12px rgba(0, 191, 255, 0.18);
+  border-color: rgba(0, 191, 255, 0.6);
 }
 
 .shadow-neon-green {
-  box-shadow: 0 0 20px rgba(158, 255, 0, 0.4);
+  box-shadow: 0 0 14px rgba(158, 255, 0, 0.18);
 }
 
 .shadow-neon-blue {
-  box-shadow: 0 0 20px rgba(0, 191, 255, 0.4);
+  box-shadow: 0 0 14px rgba(0, 191, 255, 0.18);
+}
+
+.dark .neon-hover:hover {
+  box-shadow: 0 0 22px rgba(158, 255, 0, 0.45);
+}
+
+.dark .neon-blue-hover:hover {
+  box-shadow: 0 0 22px rgba(0, 191, 255, 0.45);
 }
 
 /* ── Gradient Utilities ── */

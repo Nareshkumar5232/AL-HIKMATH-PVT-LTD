@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
+import { useCategoryStore } from "@/store/categoryStore";
 import {
   Zap,
   Monitor,
@@ -42,18 +42,31 @@ const cardVariants: Variants = {
 };
 
 export default function CategorySection() {
+  const { selectedCategory, setSelectedCategory } = useCategoryStore();
+
+  const handleCategoryClick = (slug: string) => {
+    setSelectedCategory(selectedCategory === slug ? null : slug);
+    // Smooth scroll to Dynamic Products Section
+    setTimeout(() => {
+      const dynamicSection = document.getElementById("dynamic-products");
+      if (dynamicSection) {
+        dynamicSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
+
   return (
-    <section className="py-20 px-4 bg-[#0F0F0F]">
+    <section className="py-20 px-4 bg-gray-50 dark:bg-[#0F0F0F] transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         {/* Section heading */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-3">
             Shop by{" "}
             <span className="text-[#9EFF00] underline decoration-[#9EFF00]/40 underline-offset-4">
               Category
             </span>
           </h2>
-          <p className="text-gray-400 max-w-xl mx-auto">
+          <p className="text-gray-600 dark:text-gray-400 max-w-xl mx-auto">
             Browse our wide range of electrical and electronics products across
             all categories.
           </p>
@@ -69,22 +82,33 @@ export default function CategorySection() {
         >
           {categories.map((cat) => {
             const Icon = cat.icon;
+            const isActive = selectedCategory === cat.slug;
             return (
               <motion.div key={cat.slug} variants={cardVariants}>
-                <Link
-                  href={`/products?category=${cat.slug}`}
-                  className="glass-card neon-hover flex flex-col items-center gap-4 p-6 text-center transition-all duration-300 group block"
+                <button
+                  onClick={() => handleCategoryClick(cat.slug)}
+                  className={`glass-card flex flex-col items-center gap-4 p-6 text-center transition-all duration-300 group block w-full outline-none
+                    ${
+                      isActive
+                        ? "shadow-neon-green border-[#9EFF00] bg-white/10"
+                        : "neon-hover bg-white/5"
+                    }
+                  `}
                 >
-                  <div className="w-14 h-14 rounded-full bg-[#9EFF00]/10 flex items-center justify-center group-hover:bg-[#9EFF00]/20 transition-colors duration-300">
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors duration-300
+                    ${isActive ? "bg-[#9EFF00]/30" : "bg-[#9EFF00]/10 group-hover:bg-[#9EFF00]/20"}
+                  `}>
                     <Icon
                       className="w-7 h-7 text-[#9EFF00]"
                       aria-hidden="true"
                     />
                   </div>
-                  <span className="text-white text-sm font-medium leading-snug">
+                  <span className={`text-sm font-medium leading-snug transition-colors
+                    ${isActive ? "text-[#9EFF00]" : "text-gray-900 dark:text-white"}
+                  `}>
                     {cat.name}
                   </span>
-                </Link>
+                </button>
               </motion.div>
             );
           })}

@@ -84,6 +84,12 @@ export interface Testimonial {
   avatar?: string;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export interface FilterState {
   category: ProductCategory | null;
   minPrice: number | null;
@@ -115,12 +121,7 @@ export interface NavItem {
   icon?: string;
 }
 
-export interface AdminStats {
-  totalRevenue: number;
-  totalOrders: number;
-  totalProducts: number;
-  totalCustomers: number;
-}
+
 
 export interface SalesDataPoint {
   month: string;

@@ -3,10 +3,12 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Zap, Search, ShoppingCart, User, Sun, Moon, Menu } from "lucide-react";
+import { Zap, Search, ShoppingCart, User, Sun, Moon, Menu, Heart } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useAuthStore } from "@/store/authStore";
 import { useScrolled } from "@/hooks/useScrolled";
 import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
 import MobileMenu from "./MobileMenu";
 
 const navLinks = [
@@ -22,13 +24,16 @@ export default function Navbar() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  const totalItems = useCartStore((state) => state.totalItems());
+  const cartTotalItems = useCartStore((state) => state.totalItems());
+  const wishlistTotalItems = useWishlistStore((state) => state.items.length);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,7 +50,7 @@ export default function Navbar() {
         className={[
           "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
           scrolled
-            ? "backdrop-blur-md bg-[#0F0F0F]/90 border-b border-white/10 shadow-lg"
+            ? "backdrop-blur-md bg-white/90 dark:bg-[#0F0F0F]/90 border-b border-gray-200 dark:border-white/10 shadow-lg"
             : "bg-transparent",
         ].join(" ")}
       >
@@ -79,7 +84,7 @@ export default function Navbar() {
                       "text-sm transition-colors duration-200",
                       isActive
                         ? "text-[#9EFF00] font-semibold"
-                        : "text-gray-300 hover:text-white",
+                        : "text-gray-900 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white",
                     ].join(" ")}
                   >
                     {link.label}
@@ -93,7 +98,7 @@ export default function Navbar() {
               {/* Search form */}
               <form
                 onSubmit={handleSearch}
-                className="hidden md:flex items-center gap-1 bg-white/10 rounded-lg px-3 py-1.5"
+                className="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-white/10 rounded-lg px-3 py-1.5 transition-colors duration-300"
               >
                 <input
                   type="text"
@@ -101,63 +106,92 @@ export default function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products…"
                   aria-label="Search products"
-                  className="bg-transparent text-sm text-white placeholder-gray-400 outline-none w-36 focus:w-48 transition-all duration-300"
+                  className="bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 outline-none w-36 focus:w-48 transition-all duration-300"
                 />
                 <button
                   type="submit"
-                  aria-label="Submit search"
-                  className="text-gray-400 hover:text-[#9EFF00] transition-colors"
+                  className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 >
                   <Search className="w-4 h-4" />
                 </button>
               </form>
 
-              {/* Cart */}
+              {/* Wishlist */}
               <Link
-                href="/cart"
-                aria-label={`Cart, ${totalItems} item${totalItems !== 1 ? "s" : ""}`}
-                className="relative p-2 text-gray-300 hover:text-white transition-colors"
+                href="/wishlist"
+                className="relative rounded-full p-2 text-gray-900 dark:text-gray-300 transition-colors hover:text-[#9EFF00] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10"
+                aria-label={`Wishlist with ${wishlistTotalItems} items`}
               >
-                <ShoppingCart className="w-5 h-5" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-[#9EFF00] text-black text-[10px] font-bold px-1">
-                    {totalItems > 99 ? "99+" : totalItems}
+                <Heart className="h-5 w-5" />
+                {wishlistTotalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#9EFF00] text-xs font-bold text-black">
+                    {wishlistTotalItems}
                   </span>
                 )}
               </Link>
 
-              {/* User dropdown */}
+              {/* Cart */}
+              <Link
+                href="/cart"
+                className="relative rounded-full p-2 text-gray-900 dark:text-gray-300 transition-colors hover:text-[#9EFF00] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10"
+                aria-label={`Cart with ${cartTotalItems} items`}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {cartTotalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#9EFF00] text-xs font-bold text-black">
+                    {cartTotalItems}
+                  </span>
+                )}
+              </Link>
+
+              {/* User / Login */}
               <div className="relative" ref={userMenuRef}>
                 <button
-                  onClick={() => setUserMenuOpen((prev) => !prev)}
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="rounded-full p-2 text-gray-900 dark:text-gray-300 transition-colors hover:text-[#9EFF00] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10"
                   aria-label="User menu"
-                  aria-expanded={userMenuOpen}
-                  aria-haspopup="true"
-                  className="p-2 text-gray-300 hover:text-white transition-colors"
                 >
-                  <User className="w-5 h-5" />
+                  <User className="h-5 w-5" />
                 </button>
                 {userMenuOpen && (
                   <div
-                    className="absolute right-0 top-full mt-2 w-40 bg-[#1A1A1A] border border-white/10 rounded-lg shadow-xl py-1 z-50"
+                    className="absolute right-0 top-full mt-2 w-44 bg-white dark:bg-[#1A1A1A] border border-gray-200 dark:border-white/10 rounded-lg shadow-xl py-1 z-50 transition-colors duration-300"
                     role="menu"
                   >
-                    <Link
-                      href="/login"
-                      role="menuitem"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      href="/register"
-                      role="menuitem"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
-                    >
-                      Register
-                    </Link>
+                    {user ? (
+                      <>
+                        <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-300">Signed in as</div>
+                        <div className="px-4 py-1 text-sm font-semibold text-gray-900 dark:text-white">{user.name}</div>
+                        <button
+                          onClick={() => {
+                            logout();
+                            setUserMenuOpen(false);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5"
+                        >
+                          Logout
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          href="/login"
+                          role="menuitem"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                        >
+                          Login
+                        </Link>
+                        <Link
+                          href="/register"
+                          role="menuitem"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                        >
+                          Register
+                        </Link>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -166,7 +200,7 @@ export default function Navbar() {
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 aria-label="Toggle theme"
-                className="p-2 text-gray-300 hover:text-white transition-colors"
+                className="p-2 text-gray-900 dark:text-gray-300 hover:text-[#9EFF00] dark:hover:text-white transition-colors"
               >
                 {theme === "dark" ? (
                   <Sun className="w-5 h-5" />
@@ -179,7 +213,7 @@ export default function Navbar() {
               <button
                 onClick={() => setMobileOpen(true)}
                 aria-label="Open mobile menu"
-                className="md:hidden p-2 text-gray-300 hover:text-white transition-colors"
+                className="md:hidden p-2 text-gray-900 dark:text-gray-300 hover:text-[#9EFF00] dark:hover:text-white transition-colors"
               >
                 <Menu className="w-5 h-5" />
               </button>

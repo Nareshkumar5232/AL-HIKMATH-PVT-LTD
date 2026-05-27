@@ -2,7 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { Star } from "lucide-react";
-import { mockTestimonials } from "@/lib/mock-data";
+import { mockTestimonials } from "@/data/testimonials";
 import type { Testimonial } from "@/types";
 
 function StarRating({ rating }: { rating: number }) {
