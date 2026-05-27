@@ -20,7 +20,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: { 
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-white">Products</h1>
         {q ? (
-          <p className="text-gray-400 mt-2">Showing results for "{q}" — {products.length} items</p>
+          <p className="text-gray-400 mt-2">Showing results for {q} — {products.length} items</p>
         ) : (
           <p className="text-gray-400 mt-2">Explore our full product range.</p>
         )}

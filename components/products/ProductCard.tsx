@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Heart, ShoppingCart, Eye, Star } from "lucide-react";
@@ -18,6 +19,7 @@ interface ProductCardProps {
 export function ProductCard({ product, onQuickView }: ProductCardProps) {
   const addItemToCart = useCartStore((s) => s.addItem);
   const { toggleItem, isInWishlist } = useWishlistStore();
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const inWishlist = isInWishlist(product.id);
   const hasDiscount =
@@ -62,16 +64,22 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
       >
         {/* Image area */}
         <div className="relative w-full h-[200px] bg-gray-100 dark:bg-[#1A1A1A] overflow-hidden transition-colors duration-300">
+          {!imgLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center animate-pulse bg-gray-100 dark:bg-gray-800">
+              <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-md" />
+            </div>
+          )}
           <Image
             src={product.images[0] ?? "/file.svg"}
             alt={product.name}
             width={280}
             height={280}
             loading="eager"
-            className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+            className={`object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 ${imgLoaded ? '' : 'opacity-0'}`}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = "/file.svg";
             }}
+            onLoad={() => setImgLoaded(true)}
           />
 
           {/* Discount badge */}

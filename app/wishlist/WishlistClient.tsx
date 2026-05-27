@@ -12,13 +12,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Heart, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import type { Product } from '@/types';
 
 export default function WishlistClient() {
   const { items, toggleItem } = useWishlistStore();
   const addItem = useCartStore((s) => s.addItem);
   const { toast } = useToast();
 
-  const handleMoveToCart = (product: any) => {
+  const handleMoveToCart = (product: Product) => {
     addItem(product);
     // remove from wishlist using toggle
     toggleItem(product);
@@ -63,7 +64,7 @@ export default function WishlistClient() {
             Your wishlist is empty
           </h2>
           <p className="mt-2 text-gray-500 dark:text-gray-400">
-            Looks like you haven’t added anything to your wishlist yet.
+            Looks like you have not added anything to your wishlist yet.
           </p>
           <div className="mt-8">
             <Link href="/products">

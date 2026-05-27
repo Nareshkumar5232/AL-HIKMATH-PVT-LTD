@@ -21,6 +21,7 @@ export default function LoginPage() {
   const params = useSearchParams();
   const redirect = params?.get("redirect") ?? "/";
   const login = useAuthStore((s) => s.login);
+  const loginWithCredentials = useAuthStore((s) => s.loginWithCredentials);
   const [showPass, setShowPass] = useState(false);
 
   const { register, handleSubmit, formState } = useForm<FormData>({
@@ -28,11 +29,15 @@ export default function LoginPage() {
   });
 
   function onSubmit(data: FormData) {
-    // Fake auth — replace with real API
-    const user = { id: "u-1", name: "Demo User", email: data.email };
-    login(user, "demo-token");
-    toast.success("Login successful");
-    router.push(redirect);
+    // Call the auth API
+    loginWithCredentials(data.email, data.password).then((ok) => {
+      if (ok) {
+        toast.success("Login successful");
+        router.push(redirect);
+      } else {
+        toast.error("Invalid credentials");
+      }
+    });
   }
 
   return (
@@ -66,48 +71,4 @@ export default function LoginPage() {
     </div>
   );
 }
-"use client";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginFormData } from '@/lib/validations';
-import { useAuthStore } from '@/store/authStore';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useRouter } from 'next/navigation';
-import { useToast } from '@/hooks/use-toast';
-
-export default function LoginPage() {
-  const { register, handleSubmit, formState } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  });
-  const login = useAuthStore((s) => s.login);
-  const router = useRouter();
-  const { toast } = useToast();
-
-  function onSubmit(data: LoginFormData) {
-    // For demo: accept any credentials and set a mock user
-    login({ id: 'user-1', name: 'Demo User', email: data.email });
-    toast({ title: 'Logged in', description: `Welcome back, ${data.email}` });
-    router.push('/');
-  }
-
-  return (
-    <main className="max-w-md mx-auto px-4 py-24">
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="text-sm text-gray-500">Email</label>
-          <Input type="email" {...register('email')} />
-        </div>
-        <div>
-          <label className="text-sm text-gray-500">Password</label>
-          <Input type="password" {...register('password')} />
-        </div>
-        <div>
-          <Button type="submit">Login</Button>
-        </div>
-      </form>
-    </main>
-  );
-}

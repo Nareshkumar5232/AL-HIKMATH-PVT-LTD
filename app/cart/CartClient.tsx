@@ -16,6 +16,8 @@ export default function CartClient() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // This effect intentionally sets mounted after hydration
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -25,8 +27,8 @@ export default function CartClient() {
     return (
       <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center bg-gray-50 dark:bg-[#0F0F0F] transition-colors duration-300">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Your Cart is Empty</h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md text-center">
-          Looks like you haven't added anything yet. Discover our premium electrical and electronics collection.
+          <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md text-center">
+          Looks like you have not added anything yet. Discover our premium electrical and electronics collection.
         </p>
         <Link
           href="/products"
@@ -148,7 +150,7 @@ export default function CartClient() {
                   if (!isAuth) {
                     toast.error("Please login to continue your purchase");
                     const redirect = encodeURIComponent('/cart');
-                    (window.location as any).href = `/login?redirect=${redirect}`;
+                    window.location.href = `/login?redirect=${redirect}`;
                     return;
                   }
                   // proceed to checkout (placeholder)

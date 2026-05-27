@@ -23,17 +23,17 @@ export default function HeroSection() {
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-[#0F0F0F] dark:via-[#1A1A1A] dark:to-[#0F0F0F] transition-colors duration-300">
       {/* Animated background glow blobs */}
       <div
-        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl dark:opacity-20 opacity-6 animate-pulse"
+        className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full blur-3xl dark:opacity-30 opacity-10 animate-pulse"
         style={{ background: "#9EFF00" }}
         aria-hidden="true"
       />
       <div
-        className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl dark:opacity-15 opacity-5 animate-pulse"
+        className="absolute bottom-1/4 right-1/4 w-72 h-72 rounded-full blur-3xl dark:opacity-20 opacity-8 animate-pulse"
         style={{ background: "#00BFFF", animationDelay: "1s" }}
         aria-hidden="true"
       />
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl dark:opacity-5 opacity-2 animate-pulse"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full blur-3xl dark:opacity-10 opacity-4 animate-pulse"
         style={{ background: "#9EFF00", animationDelay: "2s" }}
         aria-hidden="true"
       />

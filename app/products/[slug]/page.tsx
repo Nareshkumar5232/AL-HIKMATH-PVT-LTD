@@ -10,6 +10,7 @@ import { Star, ShoppingCart, Heart } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { ProductCard } from '@/components/products/ProductCard';
 import ProductDetailsClient from './ProductDetailsClient';
+import type { Product } from '@/types';
 
 // This function is required for static generation of product pages
 export async function generateStaticParams() {
@@ -41,11 +42,10 @@ function getProductBySlug(slug: string) {
   return found;
 }
 
-function getRelatedProducts(currentProduct: any) {
-  return mockProducts.filter(
-    (p) =>
-      p.category === currentProduct.category && p.id !== currentProduct.id
-  ).slice(0, 4);
+function getRelatedProducts(currentProduct: Product) {
+  return mockProducts
+    .filter((p) => p.category === currentProduct.category && p.id !== currentProduct.id)
+    .slice(0, 4);
 }
 
 export default function ProductDetailsPage({ params }: { params: { slug: string } }) {
