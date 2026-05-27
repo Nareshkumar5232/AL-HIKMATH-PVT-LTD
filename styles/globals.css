@@ -1,0 +1,15 @@
+/* 
+ * AL HIKMATH ENTERPRISES PVT LTD — Global Styles
+ * This file is the canonical styles reference.
+ * The actual styles are imported from app/globals.css
+ * 
+ * Brand Colors:
+ *   Neon Green:     #9EFF00
+ *   Electric Blue:  #00BFFF
+ *   Matte Black:    #0F0F0F
+ *   Dark Gray:      #1A1A1A
+ *   White:          #FFFFFF
+ */
+
+/* Re-export from app/globals.css */
+@import "../app/globals.css";
