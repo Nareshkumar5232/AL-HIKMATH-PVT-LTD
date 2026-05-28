@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 import StatsSection from "@/components/home/StatsSection";
 import CategorySection from "@/components/home/CategorySection";
@@ -19,8 +17,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main>
-      <Navbar />
+    <>
       <HeroSection />
       <StatsSection />
       <CategorySection />
@@ -30,7 +27,6 @@ export default function HomePage() {
       <Testimonials />
       <CTABanner />
       <NewsletterSection />
-      <Footer />
-    </main>
+    </>
   );
 }

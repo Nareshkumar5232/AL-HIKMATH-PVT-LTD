@@ -57,7 +57,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16 gap-4">
             {/* ── Left: Logo ── */}
             <Link href="/" className="flex items-center shrink-0">
-              <Image src="/images/logo.png" alt="AL HIKMATH ENTERPRISES" width={180} height={70} className="h-auto" />
+              <Image src="/images/logo.png" alt="AL HIKMATH ENTERPRISES" width={240} height={90} className="h-auto" />
             </Link>
 
             {/* ── Center: Nav links (desktop) ── */}
