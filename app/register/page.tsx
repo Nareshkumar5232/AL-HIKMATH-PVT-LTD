@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,7 +43,10 @@ export default function RegisterPage() {
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-md bg-white dark:bg-[#121212] p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-white/6 backdrop-blur-md"
       >
-        <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Create an account</h2>
+        <div className="flex justify-center mb-6">
+          <Image src="/images/logo.png" alt="AL HIKMATH ENTERPRISES" width={140} height={60} className="h-auto" />
+        </div>
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Create an account</h2>
         <div className="mb-4">
           <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">Full name</label>
           <input {...register("name")} className="w-full p-3 rounded-lg border border-gray-200 dark:border-white/6 bg-transparent" />

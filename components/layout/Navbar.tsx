@@ -2,8 +2,9 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { Zap, Search, ShoppingCart, User, Menu, Heart } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, Heart } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useScrolled } from "@/hooks/useScrolled";
 import { useCartStore } from "@/store/cartStore";
@@ -55,16 +56,8 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16 gap-4">
             {/* ── Left: Logo ── */}
-            <Link href="/" className="flex items-center gap-2 shrink-0">
-              <Zap className="w-6 h-6 text-[#9EFF00]" aria-hidden="true" />
-              <div className="flex flex-col leading-none">
-                <span className="font-bold text-[#9EFF00] tracking-wide text-base">
-                  AL HIKMATH
-                </span>
-                <span className="text-white text-xs tracking-widest uppercase">
-                  ENTERPRISES
-                </span>
-              </div>
+            <Link href="/" className="flex items-center shrink-0">
+              <Image src="/images/logo.png" alt="AL HIKMATH ENTERPRISES" width={120} height={50} className="h-auto" />
             </Link>
 
             {/* ── Center: Nav links (desktop) ── */}
