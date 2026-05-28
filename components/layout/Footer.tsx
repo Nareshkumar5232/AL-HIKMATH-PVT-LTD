@@ -17,7 +17,7 @@ const contactDetails = [
     icon: MapPin,
     text: "No. 16/127, Inbharajapuram 1st Street, Bajanai Kovil Street, Choolaimedu - 600094, Chennai",
   },
-  { icon: Mail, text: "info@alhikmath.com" },
+  { icon: Mail, text: "care@alhikmath.com" },
 ];
 
 const socialLinks = [

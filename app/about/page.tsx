@@ -107,8 +107,8 @@ export default function AboutPage() {
               <h3 className="text-[#9EFF00] text-lg font-semibold mb-4">Contact Information</h3>
               <p className="text-gray-400 mb-2">📞 WhatsApp: +91 9342698344</p>
               <p className="text-gray-400 mb-4">📞 WhatsApp: +91 9342798344</p>
-              <p className="text-gray-400 mb-4">🏢 OFFICE: 044-3154 4571</p>
-              <p className="text-gray-400 mb-4">🏢 OFFICE: 044-3539 5138</p>
+              <p className="text-gray-400 mb-4">🏢 OFFICE: 044-3154 4571 &amp; 044-3539 5138</p>
+              <p className="text-gray-400 mb-2">📧 care@alhikmath.com</p>
               <p className="text-gray-400">📧 info@alhikmath.com</p>
             </div>
             <div className="p-6 bg-black/40 rounded-lg">
