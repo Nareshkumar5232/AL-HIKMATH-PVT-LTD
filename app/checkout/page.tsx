@@ -22,7 +22,7 @@ const checkoutSchema = z.object({
   city: z.string().min(2, "City required"),
   state: z.string().min(2, "State required"),
   pincode: z.string().regex(/^\d{6}$/, "Valid 6-digit pincode required"),
-  paymentMethod: z.enum(["online", "cod"], { errorMap: () => ({ message: "Select payment method" }) }),
+  paymentMethod: z.enum(["online", "cod"]).refine(val => val !== undefined, "Select payment method"),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -31,7 +31,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const cartItems = useCartStore((state) => state.items);
-  const clearCart = useCartStore((state) => state.clear);
+  const clearCart = useCartStore((state) => state.clearCart);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, handleSubmit, formState: { errors }, watch } = useForm<CheckoutFormData>({
@@ -67,7 +67,7 @@ export default function CheckoutPage() {
   }
 
   // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   const shipping = subtotal > 5000 ? 0 : 149;
   const tax = Math.round(subtotal * 0.05); // 5% tax
   const total = subtotal + shipping + tax;
@@ -298,18 +298,18 @@ export default function CheckoutPage() {
               {/* Cart Items */}
               <div className="space-y-4 mb-6 pb-6 border-b border-gray-200 dark:border-white/10">
                 {cartItems.map((item) => (
-                  <div key={`${item.id}-${item.quantity}`} className="flex gap-3">
+                  <div key={`${item.product.id}-${item.quantity}`} className="flex gap-3">
                     <Image
-                      src={item.images?.[0] || "/images/placeholder-product.svg"}
-                      alt={item.name}
+                      src={item.product.images?.[0] || "/images/placeholder-product.svg"}
+                      alt={item.product.name}
                       width={60}
                       height={60}
                       className="rounded-lg object-cover"
                     />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2">{item.name}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2">{item.product.name}</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Qty: {item.quantity}</p>
-                      <p className="text-sm font-bold text-[#9EFF00] mt-1">{formatCurrency(item.price * item.quantity)}</p>
+                      <p className="text-sm font-bold text-[#9EFF00] mt-1">{formatCurrency(item.product.price * item.quantity)}</p>
                     </div>
                   </div>
                 ))}
