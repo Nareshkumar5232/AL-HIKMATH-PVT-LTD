@@ -17,9 +17,9 @@ export default function AboutPage() {
             <Image
               src="/images/logo.png"
               alt="AL HIKMATH ENTERPRISES"
-              width={800}
-              height={450}
-              className="w-full max-w-xs md:max-w-2xl h-auto"
+              width={400}
+              height={224}
+              className="w-full max-w-xs md:max-w-md h-auto"
               priority
             />
           </div>
