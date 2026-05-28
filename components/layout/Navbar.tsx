@@ -3,8 +3,7 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Zap, Search, ShoppingCart, User, Sun, Moon, Menu, Heart } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Zap, Search, ShoppingCart, User, Menu, Heart } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useScrolled } from "@/hooks/useScrolled";
 import { useCartStore } from "@/store/cartStore";
@@ -22,7 +21,6 @@ export default function Navbar() {
   const scrolled = useScrolled();
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
 
   const cartTotalItems = useCartStore((state) => state.totalItems());
   const wishlistTotalItems = useWishlistStore((state) => state.items.length);
@@ -195,19 +193,6 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
-
-              {/* Theme toggle */}
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                aria-label="Toggle theme"
-                className="p-2 text-gray-900 dark:text-gray-300 hover:text-[#9EFF00] dark:hover:text-white transition-colors"
-              >
-                {theme === "dark" ? (
-                  <Sun className="w-5 h-5" />
-                ) : (
-                  <Moon className="w-5 h-5" />
-                )}
-              </button>
 
               {/* Hamburger (mobile only) */}
               <button

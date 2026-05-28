@@ -48,8 +48,9 @@ function getRelatedProducts(currentProduct: Product) {
     .slice(0, 4);
 }
 
-export default function ProductDetailsPage({ params }: { params: { slug: string } }) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
 
   if (!product) {
     notFound();
