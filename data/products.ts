@@ -1,18 +1,22 @@
-﻿import type { Product } from "@/types";
+import type { Product } from "@/types";
 
 const PLACEHOLDER = "/images/placeholder-product.svg";
 
 /**
  * AL HIKMATH ENTERPRISES - Premium Electrical & Electronics Store
  * 
- * Product Catalog:
- * - 2 carefully curated premium products
- * - Real-looking professional listings  
- * - Complete with specifications and pricing
+ * Product Catalog with realistic products spread across 7 categories:
+ * - Mobile Accessories
+ * - Electronics
+ * - Electrical Appliances
+ * - Computer Accessories
+ * - Chargers
+ * - Earphones
+ * - Smart Devices
  */
 
 export const mockProducts: Product[] = [
-  // ── Premium Electrical Appliances ──────────────────────────────────────
+  // ── Electrical Appliances ──────────────────────────────────────────────────
   {
     id: "prod-001",
     slug: "havells-led-bulb-9w",
@@ -71,4 +75,369 @@ export const mockProducts: Product[] = [
     isFeatured: true,
     createdAt: "2024-01-15T08:00:00.000Z",
   },
+  {
+    id: "prod-003",
+    slug: "philips-dry-iron-1000w",
+    name: "Philips Classic Dry Iron 1000W",
+    description:
+      "Heavyweight classic dry iron from Philips. Features a high-performance Linished soleplate for easy gliding on all fabrics. 1000W power enables rapid heating and precise temperature control. Ergonomic handle design and indicator light for convenient operations.",
+    shortDescription: "1000W dry iron with linished soleplate and temperature control.",
+    price: 1199,
+    originalPrice: 1499,
+    category: "electrical-appliances",
+    brand: "Philips",
+    images: [PLACEHOLDER],
+    rating: 4.6,
+    reviewCount: 245,
+    stock: 80,
+    specifications: {
+      "Wattage": "1000W",
+      "Soleplate": "Linished aluminum",
+      "Temperature Control": "Yes - Dial based",
+      "Cord Length": "1.8 metres",
+      "Indicator Light": "Yes",
+    },
+    tags: ["iron", "dry-iron", "philips", "electrical-appliances"],
+    isFeatured: false,
+    createdAt: "2024-02-01T10:00:00.000Z",
+  },
+
+  // ── Mobile Accessories ─────────────────────────────────────────────────────
+  {
+    id: "prod-004",
+    slug: "spigen-ultra-hybrid-iphone-15",
+    name: "Spigen Ultra Hybrid Case for iPhone 15 Pro",
+    description:
+      "Premium crystal-clear case with TPU bumper and durable PC back panel. Provides military-grade drop protection with Air Cushion Technology. Raised bezels shield the screen and camera lenses from flat surfaces. Slim profile compatible with wireless charging.",
+    shortDescription: "Crystal-clear hybrid protection case with air cushion bumpers.",
+    price: 1499,
+    originalPrice: 1999,
+    category: "mobile-accessories",
+    brand: "Spigen",
+    images: [PLACEHOLDER],
+    rating: 4.7,
+    reviewCount: 520,
+    stock: 120,
+    specifications: {
+      "Material": "TPU + Polycarbonate",
+      "Compatibility": "iPhone 15 Pro",
+      "Drop Protection": "Military Grade (Mil-Grade)",
+      "Wireless Charging": "Yes",
+    },
+    tags: ["phone-case", "spigen", "iphone-15-pro", "mobile-accessories"],
+    isFeatured: true,
+    createdAt: "2024-01-20T12:00:00.000Z",
+  },
+  {
+    id: "prod-005",
+    slug: "boAt-magnetic-car-mount",
+    name: "boAt Magnetic Dashboard Car Mount",
+    description:
+      "Compact dashboard and windshield magnetic phone holder. Features 6 powerful N52 neodymium magnets that securely grip any smartphone. 360-degree rotation allows for optimal viewing angles. Residue-free suction cup can be easily cleaned and reused.",
+    shortDescription: "Ultra-strong magnetic car phone holder with 360-degree rotation.",
+    price: 499,
+    originalPrice: 799,
+    category: "mobile-accessories",
+    brand: "boAt",
+    images: [PLACEHOLDER],
+    rating: 4.2,
+    reviewCount: 98,
+    stock: 250,
+    specifications: {
+      "Mount Type": "Suction Cup + Magnetic",
+      "Magnet Strength": "6x N52 Neodymium",
+      "Rotation": "360-degree ball joint",
+      "Compatibility": "Universal (all phones)",
+    },
+    tags: ["car-mount", "boat", "phone-holder", "mobile-accessories"],
+    isFeatured: false,
+    createdAt: "2024-02-10T14:00:00.000Z",
+  },
+
+  // ── Electronics ───────────────────────────────────────────────────────────
+  {
+    id: "prod-006",
+    slug: "sandisk-extreme-portable-ssd-1tb",
+    name: "SanDisk Extreme Portable SSD 1TB",
+    description:
+      "High-speed NVMe solid state drive with up to 1050MB/s read and 1000MB/s write speeds. Features a ruggedized silicone shell offering up to 3-meter drop protection and IP65 water/dust resistance. Secure handy carabiner loop for easy travel attachment.",
+    shortDescription: "Ruggedized NVMe portable SSD with 1050MB/s transfer speeds, IP65.",
+    price: 8999,
+    originalPrice: 14999,
+    category: "electronics",
+    brand: "SanDisk",
+    images: [PLACEHOLDER],
+    rating: 4.8,
+    reviewCount: 1420,
+    stock: 45,
+    specifications: {
+      "Capacity": "1TB",
+      "Interface": "USB 3.2 Gen 2 Type-C",
+      "Read Speed": "Up to 1050 MB/s",
+      "Write Speed": "Up to 1000 MB/s",
+      "Water Resistance": "IP65 rated",
+    },
+    tags: ["ssd", "portable-ssd", "sandisk", "electronics", "storage"],
+    isFeatured: true,
+    createdAt: "2024-01-05T09:00:00.000Z",
+  },
+  {
+    id: "prod-007",
+    slug: "sony-s20r-soundbar-5-1ch",
+    name: "Sony HT-S20R 5.1ch Home Theatre Soundbar",
+    description:
+      "Real 5.1 channels of cinematic surround sound. Includes a slim soundbar, external subwoofer, and rear speakers. 400W total power output delivers punches of high-fidelity audio. Bluetooth connectivity, USB port, and HDMI ARC support for simple setup.",
+    shortDescription: "400W 5.1ch Dolby Digital home theatre soundbar with subwoofer.",
+    price: 17990,
+    originalPrice: 19990,
+    category: "electronics",
+    brand: "Sony",
+    images: [PLACEHOLDER],
+    rating: 4.6,
+    reviewCount: 850,
+    stock: 20,
+    specifications: {
+      "Total Power": "400W",
+      "Channels": "5.1 Channels",
+      "Connectivity": "Bluetooth, HDMI ARC, Optical, USB",
+      "Subwoofer Type": "Wired Subwoofer",
+    },
+    tags: ["soundbar", "home-theatre", "sony", "audio", "electronics"],
+    isFeatured: true,
+    createdAt: "2024-01-30T15:00:00.000Z",
+  },
+
+  // ── Computer Accessories ───────────────────────────────────────────────────
+  {
+    id: "prod-008",
+    slug: "logitech-mx-master-3s",
+    name: "Logitech MX Master 3S Wireless Mouse",
+    description:
+      "High-precision flagship wireless mouse with silent clicks and an 8K DPI track-anywhere optical sensor. MagSpeed electromagnetic scrolling wheel scrolls 1000 lines per second in complete silence. Ergonomic thumb rest with gesture button controls.",
+    shortDescription: "Premium wireless mouse, 8000 DPI sensor, quiet click, hyper-fast scroll.",
+    price: 9495,
+    originalPrice: 10995,
+    category: "computer-accessories",
+    brand: "Logitech",
+    images: [PLACEHOLDER],
+    rating: 4.9,
+    reviewCount: 360,
+    stock: 35,
+    specifications: {
+      "Sensor": "Darkfield High Precision (8000 DPI)",
+      "Connectivity": "Bluetooth & Logi Bolt USB",
+      "Battery": "Rechargeable Li-Po (500 mAh)",
+      "Buttons": "7 customizable buttons",
+    },
+    tags: ["mouse", "wireless-mouse", "logitech", "computer-accessories", "premium"],
+    isFeatured: true,
+    createdAt: "2024-02-15T08:30:00.000Z",
+  },
+  {
+    id: "prod-009",
+    slug: "keychron-k2-mechanical-keyboard",
+    name: "Keychron K2 V2 Mechanical Keyboard",
+    description:
+      "75% layout compact mechanical keyboard featuring Gateron G-Pro switches. Double-shot keycaps with beautiful RGB backlighting. Multi-device wireless connectivity connects up to 3 devices via Bluetooth 5.1. Includes Mac & Windows key layouts.",
+    shortDescription: "Tactile 75% layout hot-swappable wireless mechanical keyboard.",
+    price: 7499,
+    originalPrice: 8999,
+    category: "computer-accessories",
+    brand: "Keychron",
+    images: [PLACEHOLDER],
+    rating: 4.7,
+    reviewCount: 154,
+    stock: 50,
+    specifications: {
+      "Layout": "75% (84 Keys)",
+      "Switches": "Gateron Brown (Tactile)",
+      "Backlight": "RGB (18+ modes)",
+      "Battery Life": "Up to 240 hours (backlight off)",
+    },
+    tags: ["keyboard", "mechanical-keyboard", "keychron", "computer-accessories"],
+    isFeatured: false,
+    createdAt: "2024-02-20T11:00:00.000Z",
+  },
+
+  // ── Chargers ───────────────────────────────────────────────────────────────
+  {
+    id: "prod-010",
+    slug: "anker-nano-ii-65w",
+    name: "Anker Nano II 65W GaN Charger",
+    description:
+      "Ultra-compact GaN fast charger. 65W USB-C power delivery output charges MacBooks, iPhones, and Android devices at lightning speed. Up to 58% smaller than typical stock laptop chargers. Integrated advanced security protections.",
+    shortDescription: "Ultra-compact 65W GaN fast charger with USB-C power delivery.",
+    price: 3299,
+    originalPrice: 4299,
+    category: "chargers",
+    brand: "Anker",
+    images: [PLACEHOLDER],
+    rating: 4.8,
+    reviewCount: 670,
+    stock: 140,
+    specifications: {
+      "Output Wattage": "65W",
+      "Technology": "GaN II (Gallium Nitride)",
+      "Ports": "1x USB-C",
+      "Compatibility": "Universal (PD compatible)",
+    },
+    tags: ["charger", "gan-charger", "anker", "chargers", "fast-charging"],
+    isFeatured: true,
+    createdAt: "2024-01-22T09:00:00.000Z",
+  },
+  {
+    id: "prod-011",
+    slug: "mi-wireless-charging-pad-10w",
+    name: "Mi Qi Wireless Charging Pad 10W",
+    description:
+      "Universal Qi-certified 10W wireless charging pad with metallic finish. Features intelligent detection of foreign metallic objects. Integrated cooling systems keep the device temperature low. Premium non-slip silicone surface.",
+    shortDescription: "10W fast wireless charging pad with Qi certification and metal body.",
+    price: 999,
+    originalPrice: 1499,
+    category: "chargers",
+    brand: "Mi",
+    images: [PLACEHOLDER],
+    rating: 4.1,
+    reviewCount: 310,
+    stock: 90,
+    specifications: {
+      "Output": "10W Max",
+      "Standard": "Qi Certified",
+      "Shell Material": "Aluminum alloy + Silicone",
+      "Port": "USB Type-C input",
+    },
+    tags: ["wireless-charger", "mi", "qi-charger", "chargers"],
+    isFeatured: false,
+    createdAt: "2024-02-05T16:00:00.000Z",
+  },
+
+  // ── Earphones ──────────────────────────────────────────────────────────────
+  {
+    id: "prod-012",
+    slug: "oneplus-buds-3-anc",
+    name: "OnePlus Buds 3 Pro ANC Earbuds",
+    description:
+      "High-definition true wireless earbuds featuring 49dB hybrid active noise cancellation. Dual-driver acoustic setup delivers deep bass and crisp vocals. Up to 44 hours of total playback time with the sleek charging case. IP55 sweat resistance.",
+    shortDescription: "49dB ANC true wireless earbuds, dual-drivers, 44h battery life.",
+    price: 5499,
+    originalPrice: 6499,
+    category: "earphones",
+    brand: "OnePlus",
+    images: [PLACEHOLDER],
+    rating: 4.6,
+    reviewCount: 420,
+    stock: 110,
+    specifications: {
+      "ANC Depth": "Up to 49dB",
+      "Drivers": "10.4mm woofer + 6mm tweeter",
+      "Battery Life": "Up to 44 hours (ANC off)",
+      "Water Resistance": "IP55 (buds only)",
+    },
+    tags: ["earbuds", "anc", "oneplus", "audio", "earphones"],
+    isFeatured: true,
+    createdAt: "2024-02-18T10:00:00.000Z",
+  },
+  {
+    id: "prod-013",
+    slug: "boat-rockerz-255-pro",
+    name: "boAt Rockerz 255 Pro+ Wireless Neckband",
+    description:
+      "Ergonomic wireless neckband earphone featuring boAt Signature Sound. Delivers massive bass and offers up to 40 hours of massive battery life. ASAP charge technology gives 10 hours of playback with just 10 minutes of charge. IPX7 waterproof rating.",
+    shortDescription: "Wireless neckband with 40-hour playback and ASAP fast charging.",
+    price: 1299,
+    originalPrice: 2990,
+    category: "earphones",
+    brand: "boAt",
+    images: [PLACEHOLDER],
+    rating: 4.3,
+    reviewCount: 1890,
+    stock: 300,
+    specifications: {
+      "Playback Time": "Up to 40 hours",
+      "Driver Size": "10mm dynamic driver",
+      "Bluetooth Version": "v5.0",
+      "IP Rating": "IPX7 waterproof",
+    },
+    tags: ["neckband", "wireless-earphones", "boat", "earphones", "budget"],
+    isFeatured: false,
+    createdAt: "2024-01-25T14:30:00.000Z",
+  },
+
+  // ── Smart Devices ──────────────────────────────────────────────────────────
+  {
+    id: "prod-014",
+    slug: "realme-smart-security-camera-360",
+    name: "realme Smart Security Camera 360",
+    description:
+      "1080p full HD smart home security camera with 360-degree horizontal panning. Features infrared night vision, AI motion tracking, and real-time voice alerts. Fully compatible with Google Assistant and Amazon Alexa. Supports microSD cards up to 128GB.",
+    shortDescription: "1080p smart 360° security camera with night vision and motion tracking.",
+    price: 2499,
+    originalPrice: 3999,
+    category: "smart-devices",
+    brand: "realme",
+    images: [PLACEHOLDER],
+    rating: 4.4,
+    reviewCount: 512,
+    stock: 65,
+    specifications: {
+      "Resolution": "1080p Full HD",
+      "Angle": "360-degree panoramic tilt",
+      "Night Vision": "Infrared night vision",
+      "Storage": "MicroSD slot (up to 128GB)",
+    },
+    tags: ["security-camera", "realme", "smart-home", "smart-devices"],
+    isFeatured: true,
+    createdAt: "2024-02-12T08:00:00.000Z",
+  },
+  {
+    id: "prod-015",
+    slug: "wipro-smart-plug-16a",
+    name: "Wipro 16A Smart Plug with Energy Monitoring",
+    description:
+      "Heavy-duty 16A smart plug for appliances like geysers, ACs, and heaters. Connects directly to local 2.4GHz Wi-Fi without any hubs. Features scheduled timers, energy usage monitoring, and voice control via Alexa & Google Assistant.",
+    shortDescription: "16A Wi-Fi smart plug with scheduler and real-time energy tracking.",
+    price: 999,
+    originalPrice: 1990,
+    category: "smart-devices",
+    brand: "Wipro",
+    images: [PLACEHOLDER],
+    rating: 4.5,
+    reviewCount: 380,
+    stock: 180,
+    specifications: {
+      "Rating": "16A Max Load",
+      "Wi-Fi": "2.4 GHz only",
+      "App Control": "Wipro Next Smart Home App",
+      "Voice Support": "Alexa, Google Assistant",
+    },
+    tags: ["smart-plug", "wipro", "smart-home", "smart-devices"],
+    isFeatured: false,
+    createdAt: "2024-01-18T11:00:00.000Z",
+  },
+  {
+    id: "prod-016",
+    slug: "wipro-smart-bulb-9w",
+    name: "Wipro 9W LED Smart Bulb (RGB)",
+    description:
+      "16 million colors RGB smart bulb from Wipro. Fits standard B22 holders and connects via Wi-Fi. Features music sync, dynamic color scenes, brightness tuning, and hands-free voice commands via smart assistants.",
+    shortDescription: "9W RGB Wi-Fi smart bulb, B22 base, 16 million colors.",
+    price: 599,
+    originalPrice: 999,
+    category: "smart-devices",
+    brand: "Wipro",
+    images: [PLACEHOLDER],
+    rating: 4.4,
+    reviewCount: 420,
+    stock: 220,
+    specifications: {
+      "Wattage": "9W",
+      "Base Type": "B22",
+      "Color Options": "RGB (16 million colors)",
+      "Lumens": "810 lm",
+      "Wi-Fi": "2.4 GHz",
+    },
+    tags: ["smart-bulb", "wipro", "smart-home", "smart-devices", "led"],
+    isFeatured: false,
+    createdAt: "2024-01-29T10:00:00.000Z",
+  }
 ];

@@ -5,6 +5,7 @@
 import { useEffect } from "react";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useRecentlyViewedStore } from "@/store/recentlyViewedStore";
+import { useProductFilterStore } from "@/store/productFilterStore";
 
 /**
  * Triggers manual rehydration of persisted Zustand stores on client mount.
@@ -15,6 +16,7 @@ export function StoreHydration() {
   useEffect(() => {
     useWishlistStore.persist.rehydrate();
     useRecentlyViewedStore.persist.rehydrate();
+    useProductFilterStore.persist.rehydrate();
   }, []);
   return null;
 }
