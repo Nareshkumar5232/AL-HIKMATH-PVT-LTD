@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { StoreHydration } from "@/components/providers";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -78,7 +81,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <StoreHydration />
-          {children}
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+          <WhatsAppButton />
           <Toaster
             richColors
             position="top-right"

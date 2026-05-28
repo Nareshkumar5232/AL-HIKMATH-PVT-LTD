@@ -1,66 +1,6 @@
 import Link from "next/link";
-import { Zap, Phone, MapPin, Mail, MessageCircle } from "lucide-react";
-
-// SVG brand icons (lucide-react v1.x removed social brand icons)
-function FacebookIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-    </svg>
-  );
-}
-
-function InstagramIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-    </svg>
-  );
-}
-
-function TwitterIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  );
-}
-
-function LinkedinIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-      <rect width="4" height="12" x="2" y="9" />
-      <circle cx="4" cy="4" r="2" />
-    </svg>
-  );
-}
+import Image from "next/image";
+import { Phone, MapPin, Mail, MessageCircle } from "lucide-react";
 
 const quickLinks = [
   { label: "Home", href: "/" },
@@ -73,39 +13,17 @@ const quickLinks = [
 const contactDetails = [
   { icon: Phone, text: "+91 9342698344" },
   { icon: Phone, text: "+91 9342798344" },
-  { icon: Phone, text: "044-3154 4571 (Office)" },
-  { icon: Phone, text: "044-3539 5138 (Office)" },
   {
     icon: MapPin,
-    text: "No. 16/127, Inbharajapuram 1st Street, Bajanai Kovil Street, Choolaimedu - 600094",
+    text: "No. 16/127, Inbharajapuram 1st Street, Bajanai Kovil Street, Choolaimedu - 600094, Chennai",
   },
   { icon: Mail, text: "info@alhikmath.com" },
 ];
 
 const socialLinks = [
   {
-    label: "Facebook",
-    href: "https://facebook.com",
-    icon: FacebookIcon,
-  },
-  {
-    label: "Instagram",
-    href: "https://instagram.com",
-    icon: InstagramIcon,
-  },
-  {
-    label: "Twitter / X",
-    href: "https://twitter.com",
-    icon: TwitterIcon,
-  },
-  {
-    label: "LinkedIn",
-    href: "https://linkedin.com",
-    icon: LinkedinIcon,
-  },
-  {
     label: "WhatsApp",
-    href: "https://wa.me/919342698344",
+    href: "https://wa.me/919342798344?text=Hello%20AL%20HIKMATH%20ENTERPRISES%2C%20I%20would%20like%20to%20know%20more%20about%20your%20products.",
     icon: MessageCircle,
   },
 ];
@@ -118,15 +36,15 @@ export default function Footer() {
         {/* Column 1 — Brand */}
         <div className="flex flex-col gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Zap className="w-6 h-6 text-[#9EFF00]" aria-hidden="true" />
-              <span className="text-2xl font-bold text-[#9EFF00] tracking-wide">
-                AL HIKMATH
-              </span>
-            </div>
-            <p className="text-sm font-semibold text-white tracking-widest uppercase">
-              ENTERPRISES PVT LTD
-            </p>
+            <Link href="/" className="inline-block mb-3">
+              <Image
+                src="/images/logo.png"
+                alt="AL HIKMATH ENTERPRISES"
+                width={160}
+                height={60}
+                className="h-12 w-auto"
+              />
+            </Link>
           </div>
           <p className="text-gray-400 text-sm leading-relaxed">
             Your trusted partner for premium electrical and electronics
