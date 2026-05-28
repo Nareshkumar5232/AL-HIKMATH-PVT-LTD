@@ -41,8 +41,8 @@ export default function Footer() {
                 src="/images/logo.png"
                 alt="AL HIKMATH ENTERPRISES"
                 width={160}
-                height={60}
-                className="h-12 w-auto"
+                height={89}
+                className="h-12 w-auto object-contain"
               />
             </Link>
           </div>
