@@ -3,12 +3,12 @@ import type { Product } from "@/types";
 const PLACEHOLDER = "/images/placeholder-product.svg";
 
 /**
- * AL HIKMATH ENTERPRISES - Premium Electrical & Electronics Store
+ * AL HIKMATH ENTERPRISES - Electronics, Computers & IT Products Store
  * 
  * Product Catalog with realistic products spread across 7 categories:
  * - Mobile Accessories
  * - Electronics
- * - Electrical Appliances
+ * - Technology Solutions
  * - Computer Accessories
  * - Chargers
  * - Earphones
@@ -16,7 +16,7 @@ const PLACEHOLDER = "/images/placeholder-product.svg";
  */
 
 export const mockProducts: Product[] = [
-  // ── Electrical Appliances ──────────────────────────────────────────────────
+  // ── Technology Solutions ───────────────────────────────────────────────────
   {
     id: "prod-001",
     slug: "havells-led-bulb-9w",

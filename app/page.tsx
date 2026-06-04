@@ -10,9 +10,9 @@ import CTABanner from "@/components/home/CTABanner";
 import NewsletterSection from "@/components/home/NewsletterSection";
 
 export const metadata: Metadata = {
-  title: "AL HIKMATH ENTERPRISES PVT LTD | Premium Electrical & Electronics",
+  title: "AL HIKMATH ENTERPRISES PVT LTD | Electronics, Computers & IT Products",
   description:
-    "Shop premium electrical and electronics appliances at AL HIKMATH ENTERPRISES PVT LTD — Chennai's trusted tech destination. 500+ products, 50+ brands.",
+    "Shop electronics, computers, IT accessories, networking products, and technology solutions at AL HIKMATH ENTERPRISES PVT LTD — Chennai's trusted technology destination. 500+ products, 50+ brands.",
 };
 
 export default function HomePage() {

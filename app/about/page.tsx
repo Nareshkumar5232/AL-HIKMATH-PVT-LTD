@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "About AL HIKMATH | Premium Electrical & Electronics",
-  description: "Learn about AL HIKMATH ENTERPRISES PVT LTD - your trusted partner for premium electrical and electronics appliances in Chennai.",
+  title: "About AL HIKMATH | Electronics, Computers & IT Products",
+  description: "Learn about AL HIKMATH ENTERPRISES PVT LTD - your trusted partner for electronics, computers, IT accessories, networking products, and technology solutions in Chennai.",
 };
 
 export default function AboutPage() {
@@ -27,7 +27,7 @@ export default function AboutPage() {
             About AL HIKMATH ENTERPRISES
           </h1>
           <p className="text-lg text-gray-400 mb-8">
-            Your Trusted Partner for Premium Electrical & Electronics Appliances
+            Your Trusted Partner for Electronics, Computers & IT Products
           </p>
         </div>
       </section>
@@ -39,7 +39,7 @@ export default function AboutPage() {
             <div>
               <h2 className="text-3xl font-bold mb-6 text-white">Who We Are</h2>
               <p className="text-gray-400 mb-4 leading-relaxed">
-                AL HIKMATH ENTERPRISES PVT LTD is Chennai's trusted partner for premium electrical and electronics appliances. We have been serving customers with quality products and exceptional service since our establishment.
+                AL HIKMATH ENTERPRISES PVT LTD is Chennai's trusted partner for electronics, computers, IT accessories, networking products, and technology solutions. We have been serving customers with quality products and exceptional service since our establishment.
               </p>
               <p className="text-gray-400 leading-relaxed">
                 With a commitment to excellence, genuine brands, and expert support, we ensure every customer finds the perfect solution for their needs.
@@ -62,7 +62,7 @@ export default function AboutPage() {
             {[
               {
                 title: "Quality Products",
-                description: "We offer only genuine brands and premium quality electrical & electronics appliances.",
+                description: "We offer only genuine brands and premium quality electronics, computers, and IT solutions.",
               },
               {
                 title: "Expert Support",

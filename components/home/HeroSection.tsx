@@ -58,8 +58,12 @@ export default function HeroSection() {
             variants={itemVariants}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white leading-tight"
           >
-            Premium Electrical &amp; Electronics{" "}
-            <span className="text-[#9EFF00]">Appliances</span>
+            <span className="block text-gray-900 dark:text-white">
+              Premium Electronics,
+            </span>
+            <span className="block text-[#9EFF00]">
+              Computers &amp; IT Products
+            </span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -67,8 +71,9 @@ export default function HeroSection() {
             variants={itemVariants}
             className="max-w-2xl text-gray-700 dark:text-gray-400 text-base sm:text-lg leading-relaxed"
           >
-            Discover the finest collection of electrical and electronics products
-            at AL HIKMATH ENTERPRISES PVT LTD — Chennai&apos;s trusted tech
+            Discover genuine computers, IT accessories, networking equipment,
+            electronics, peripherals, and technology solutions from AL
+            HIKMATH ENTERPRISES PVT LTD — Chennai&apos;s trusted technology
             destination.
           </motion.p>
 

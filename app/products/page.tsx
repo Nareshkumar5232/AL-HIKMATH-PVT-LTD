@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Products | AL HIKMATH ENTERPRISES",
-  description: "Browse our premium selection of electronics, electrical appliances, mobile and computer accessories, chargers, earphones, and smart devices.",
+  description: "Browse our premium selection of electronics, computers, IT accessories, networking products, chargers, earphones, smart devices, and technology solutions.",
 };
 
 interface SearchParams {
