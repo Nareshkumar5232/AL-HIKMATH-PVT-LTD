@@ -3,7 +3,6 @@
 import { motion, type Variants } from "framer-motion";
 import { useCategoryStore } from "@/store/categoryStore";
 import {
-  Zap,
   Monitor,
   Smartphone,
   Laptop,

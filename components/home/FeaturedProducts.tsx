@@ -1,22 +1,19 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
-import { ShoppingCart } from "lucide-react";
-import { toast } from "sonner";
-import { mockProducts } from "@/data/products";
-import { useCartStore } from "@/store/cartStore";
 import { useCategoryStore } from "@/store/categoryStore";
-import { formatCurrency, getDiscountPercentage } from "@/lib/utils";
 import { ProductCard } from "@/components/products/ProductCard";
-import type { Product } from "@/types";
+import { useProductsQuery } from "@/hooks/useProducts";
+import { ProductCardSkeleton } from "@/components/ui/product-card-skeleton";
 
 export default function FeaturedProducts() {
   const { selectedCategory } = useCategoryStore();
+  const { data, isLoading, isError, refetch } = useProductsQuery({ limit: 100 });
 
+  const catalog = data?.products ?? [];
   const displayProducts = selectedCategory
-    ? mockProducts.filter((p) => p.category === selectedCategory)
-    : mockProducts.filter((p) => p.isFeatured);
+    ? catalog.filter((product) => product.category === selectedCategory)
+    : catalog.filter((product) => product.isFeatured);
 
   return (
     <section id="dynamic-products" className="py-20 px-4 bg-gray-50 dark:bg-[#0F0F0F] transition-colors duration-300">
@@ -61,7 +58,22 @@ export default function FeaturedProducts() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {displayProducts.map((product, index) => (
+          {isLoading &&
+            Array.from({ length: 4 }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))}
+          {isError && (
+            <div className="col-span-full py-12 text-center text-gray-500 bg-white/5 border border-white/10 rounded-2xl">
+              <p className="mb-4">Unable to load products. Please try again later.</p>
+              <button
+                onClick={() => refetch()}
+                className="px-5 py-2 rounded-full bg-[#9EFF00] text-black font-semibold"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          {!isLoading && !isError && displayProducts.map((product, index) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 20 }}
@@ -71,7 +83,7 @@ export default function FeaturedProducts() {
               <ProductCard product={product} />
             </motion.div>
           ))}
-          {displayProducts.length === 0 && (
+          {!isLoading && !isError && displayProducts.length === 0 && (
             <div className="col-span-full py-12 text-center text-gray-500">
               No products found for this category.
             </div>

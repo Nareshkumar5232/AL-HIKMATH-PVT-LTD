@@ -1,4 +1,3 @@
-import { mockProducts } from "@/data/products";
 import ProductsClient from "@/components/products/ProductsClient";
 import type { Metadata } from "next";
 
@@ -22,7 +21,6 @@ export default async function ProductsPage({ searchParams }: PageProps) {
 
   return (
     <ProductsClient
-      initialProducts={mockProducts}
       initialSearchQuery={q}
     />
   );

@@ -23,12 +23,13 @@ import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { ProductCard } from "@/components/products/ProductCard";
 import { formatCurrency, getDiscountPercentage } from "@/lib/utils";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useProductsQuery } from "@/hooks/useProducts";
 import type { Product, ProductCategory } from "@/types";
 
 const PLACEHOLDER = "/images/placeholder-product.svg";
 
 interface ProductsClientProps {
-  initialProducts: Product[];
   initialSearchQuery?: string;
 }
 
@@ -83,7 +84,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "az", label: "Alphabetical: A-Z" },
 ];
 
-export default function ProductsClient({ initialProducts, initialSearchQuery = "" }: ProductsClientProps) {
+export default function ProductsClient({ initialSearchQuery = "" }: ProductsClientProps) {
   // Store states
   const {
     searchQuery,
@@ -105,6 +106,13 @@ export default function ProductsClient({ initialProducts, initialSearchQuery = "
 
   const addItemToCart = useCartStore((s) => s.addItem);
   const { toggleItem, isInWishlist } = useWishlistStore();
+  const debouncedSearchQuery = useDebounce(searchQuery, 350);
+  const { data, isLoading, isError, refetch } = useProductsQuery({
+    search: debouncedSearchQuery.trim() || undefined,
+    category: category === "all" ? undefined : category,
+    limit: 1000,
+  });
+  const backendProducts = data?.products ?? [];
 
   // Local UI states
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -158,7 +166,7 @@ export default function ProductsClient({ initialProducts, initialSearchQuery = "
 
   // Filter and Sort calculation
   const filteredAndSortedProducts = useMemo(() => {
-    let result = [...initialProducts];
+    let result = [...backendProducts];
 
     // Search query filter
     if (searchQuery.trim()) {
@@ -216,7 +224,7 @@ export default function ProductsClient({ initialProducts, initialSearchQuery = "
     });
 
     return result;
-  }, [initialProducts, searchQuery, category, priceRange, minRating, availability, newArrivalsOnly, sortBy]);
+  }, [backendProducts, searchQuery, category, priceRange, minRating, availability, newArrivalsOnly, sortBy]);
 
   // Group products by category
   const groupedProducts = useMemo(() => {
@@ -563,7 +571,29 @@ export default function ProductsClient({ initialProducts, initialSearchQuery = "
 
             {/* ── DYNAMIC SECTIONS GRID ── */}
             <div className="space-y-16">
-              {filteredAndSortedProducts.length === 0 ? (
+              {isLoading ? (
+                <div className="text-center py-20 bg-white/5 border border-white/10 rounded-2xl">
+                  <div className="mx-auto mb-4 h-12 w-12 rounded-full border-2 border-[#9EFF00] border-t-transparent animate-spin" />
+                  <h3 className="text-xl font-bold text-white mb-2">Loading products...</h3>
+                  <p className="text-gray-400 text-sm max-w-sm mx-auto">
+                    Fetching the latest catalog from the backend.
+                  </p>
+                </div>
+              ) : isError ? (
+                <div className="text-center py-20 bg-white/5 border border-white/10 rounded-2xl">
+                  <SlidersHorizontal className="w-12 h-12 text-[#9EFF00] mx-auto mb-4 opacity-40 animate-pulse" />
+                  <h3 className="text-xl font-bold text-white mb-2">Unable to load products. Please try again later.</h3>
+                  <p className="text-gray-400 text-sm max-w-sm mx-auto mb-6">
+                    The backend is unavailable right now.
+                  </p>
+                  <button
+                    onClick={() => refetch()}
+                    className="px-6 py-2 text-xs font-bold uppercase tracking-wider rounded-lg bg-[#9EFF00] text-black hover:scale-105 active:scale-95 transition-all shadow-[0_0_12px_rgba(158,255,0,0.3)]"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : filteredAndSortedProducts.length === 0 ? (
                 <div className="text-center py-20 bg-white/5 border border-white/10 rounded-2xl">
                   <SlidersHorizontal className="w-12 h-12 text-[#9EFF00] mx-auto mb-4 opacity-40 animate-pulse" />
                   <h3 className="text-xl font-bold text-white mb-2">No matching products found</h3>
