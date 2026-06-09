@@ -83,12 +83,24 @@ export function normalizeProduct(product: any): Product {
   const description = product.description || "";
 
   const rawImages = product.images || [];
-  const images = rawImages.length
-    ? rawImages.map((img: any) => {
-        const url = typeof img === "object" && img !== null ? img.url : img;
-        return buildBackendImageUrl(url);
-      })
-    : ["/images/placeholder-product.svg"];
+  const images: string[] = [];
+  
+  if (product.imageUrl) {
+    images.push(buildBackendImageUrl(product.imageUrl));
+  }
+  
+  if (rawImages.length) {
+    rawImages.forEach((img: any) => {
+      const url = typeof img === "object" && img !== null ? img.url : img;
+      if (url && url !== product.imageUrl) {
+        images.push(buildBackendImageUrl(url));
+      }
+    });
+  }
+  
+  if (images.length === 0) {
+    images.push("/images/placeholder-product.svg");
+  }
 
   return {
     id: productId,
@@ -106,7 +118,7 @@ export function normalizeProduct(product: any): Product {
     stock: product.stock ?? 0,
     specifications: product.specifications || {},
     tags: product.tags || [],
-    isFeatured: product.isFeatured ?? false,
+    isFeatured: product.featured ?? product.isFeatured ?? false,
     createdAt: product.createdAt || new Date().toISOString(),
   };
 }
