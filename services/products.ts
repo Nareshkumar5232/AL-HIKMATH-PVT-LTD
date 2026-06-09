@@ -264,7 +264,7 @@ export async function deleteProduct(id: string): Promise<{ success: boolean }> {
 export async function uploadProductImages(productId: string, files: File[]): Promise<{ images: string[] }> {
   const formData = new FormData();
   formData.append("productId", productId);
-  files.forEach((file) => formData.append("files", file));
+  files.forEach((file) => formData.append("images", file));
 
   return requestWithFallback<{ images: string[] }>(["/products/upload-images", "/product/upload-images"], {
     method: "POST",
