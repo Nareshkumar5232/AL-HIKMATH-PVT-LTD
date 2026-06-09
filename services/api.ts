@@ -18,9 +18,17 @@ export const apiClient: AxiosInstance = axios.create({
 
 apiClient.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("admin_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    try {
+      const authData = localStorage.getItem("al-hikmath-auth");
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        const token = parsed?.state?.token;
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
+    } catch (e) {
+      console.error("Error reading auth token:", e);
     }
   }
 

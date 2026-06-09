@@ -12,6 +12,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useCartStore } from "@/store/cartStore";
 import { ShoppingCart, MapPin, CreditCard, Truck } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { apiClient } from "@/services/api";
 
 // Form validation schema
 const checkoutSchema = z.object({
@@ -81,32 +82,42 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Map form details to backend expected body format
+      const formattedAddress = [
+        data.addressLine,
+        data.landmark,
+        data.city,
+        data.state,
+        data.pincode
+      ].filter(Boolean).join(", ");
 
-      // Create order
-      const order = {
-        orderId: `ORD-${Date.now()}`,
-        items: cartItems,
-        deliveryAddress: data,
-        paymentMethod: data.paymentMethod,
+      const orderPayload = {
+        customerId: user.id || "guest",
+        customerName: data.fullName,
+        customerEmail: user.email,
+        products: cartItems.map((item) => ({
+          productId: item.product.id,
+          productName: item.product.name,
+          quantity: item.quantity,
+          price: item.product.price,
+        })),
         total,
-        subtotal,
-        shipping,
-        tax,
-        status: data.paymentMethod === "cod" ? "confirmed" : "pending",
-        createdAt: new Date().toISOString(),
+        status: "pending",
+        paymentMethod: data.paymentMethod === "online" ? "card" : "cod",
+        shippingAddress: `${formattedAddress}. Phone: ${data.mobileNumber}`,
       };
 
-      // Save to localStorage (in real app, send to backend)
-      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      orders.push(order);
-      localStorage.setItem("orders", JSON.stringify(orders));
+      const res = await apiClient.post("/orders", orderPayload);
+      const createdOrder = res.data;
 
-      toast.success(`Order placed successfully! Order ID: ${order.orderId}`);
+      // Extract the order identifier
+      const confirmationOrderId = createdOrder.id || createdOrder.orderId || `ORD-${Date.now()}`;
+
+      toast.success(`Order placed successfully!`);
       clearCart();
-      router.push(`/order-confirmation?orderId=${order.orderId}`);
+      router.push(`/order-confirmation?orderId=${confirmationOrderId}`);
     } catch (error) {
+      console.error("Failed to place order:", error);
       toast.error("Failed to place order. Please try again.");
     } finally {
       setIsSubmitting(false);

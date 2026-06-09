@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { apiClient } from "@/services/api";
 import type { User } from "@/types";
 
 interface AuthStore {
@@ -10,6 +11,7 @@ interface AuthStore {
   isAuthenticated: boolean;
   login: (user: User, token?: string) => void;
   loginWithCredentials: (email: string, password: string) => Promise<boolean>;
+  registerWithCredentials: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -24,14 +26,19 @@ export const useAuthStore = create<AuthStore>()(
       },
           async loginWithCredentials(email: string, password: string) {
             try {
-              const res = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-              });
-              if (!res.ok) return false;
-              const data = await res.json();
-              set({ user: data.user, token: data.token, isAuthenticated: true });
+              const res = await apiClient.post("/auth/login", { email, password });
+              const { user, token } = res.data;
+              set({ user, token, isAuthenticated: true });
+              return true;
+            } catch (err) {
+              return false;
+            }
+          },
+          async registerWithCredentials(name: string, email: string, password: string) {
+            try {
+              const res = await apiClient.post("/auth/register", { name, email, password });
+              const { user, token } = res.data;
+              set({ user, token, isAuthenticated: true });
               return true;
             } catch (err) {
               return false;

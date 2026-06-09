@@ -109,10 +109,57 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
   const debouncedSearchQuery = useDebounce(searchQuery, 350);
   const { data, isLoading, isError, refetch } = useProductsQuery({
     search: debouncedSearchQuery.trim() || undefined,
-    category: category === "all" ? undefined : category,
     limit: 1000,
   });
   const backendProducts = data?.products ?? [];
+
+  // Dynamically compute categories and maps from backendProducts
+  const categoriesList = useMemo<{ id: ProductCategory | "all"; label: string }[]>(() => {
+    const categoriesSet = new Set<ProductCategory>();
+    backendProducts.forEach((p) => {
+      if (p.category) {
+        categoriesSet.add(p.category);
+      }
+    });
+
+    const list: { id: ProductCategory | "all"; label: string }[] = [
+      { id: "all", label: "All Products" },
+    ];
+
+    Array.from(categoriesSet).sort().forEach((cat) => {
+      const label = CATEGORY_MAP[cat]?.title || cat.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+      list.push({ id: cat, label });
+    });
+
+    if (list.length === 1 && backendProducts.length === 0) {
+      return [
+        { id: "all", label: "All Products" },
+        { id: "mobile-accessories", label: "Mobile Accessories" },
+        { id: "electronics", label: "Electronics" },
+        { id: "electrical-appliances", label: "Electrical Appliances" },
+        { id: "computer-accessories", label: "Computer Accessories" },
+        { id: "chargers", label: "Chargers" },
+        { id: "earphones", label: "Earphones" },
+        { id: "smart-devices", label: "Smart Devices" },
+      ];
+    }
+
+    return list;
+  }, [backendProducts]);
+
+  const categoryMap = useMemo(() => {
+    const map = { ...CATEGORY_MAP };
+    backendProducts.forEach((p) => {
+      if (p.category && !map[p.category]) {
+        const title = p.category.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+        map[p.category] = {
+          title,
+          desc: `Premium selection of ${title.toLowerCase()} from AL HIKMATH.`,
+        };
+      }
+    });
+    return map;
+  }, [backendProducts]);
 
   // Local UI states
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -226,20 +273,15 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
     return result;
   }, [backendProducts, searchQuery, category, priceRange, minRating, availability, newArrivalsOnly, sortBy]);
 
-  // Group products by category
+  // Group products by category dynamically
   const groupedProducts = useMemo(() => {
-    const groups: Record<ProductCategory, Product[]> = {
-      "mobile-accessories": [],
-      electronics: [],
-      "electrical-appliances": [],
-      "computer-accessories": [],
-      chargers: [],
-      earphones: [],
-      "smart-devices": [],
-    };
+    const groups: Record<string, Product[]> = {};
 
     filteredAndSortedProducts.forEach((p) => {
-      if (groups[p.category]) {
+      if (p.category) {
+        if (!groups[p.category]) {
+          groups[p.category] = [];
+        }
         groups[p.category].push(p);
       }
     });
@@ -320,7 +362,7 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
             ref={navContainerRef}
             className="flex items-center gap-3 overflow-x-auto no-scrollbar scroll-smooth"
           >
-            {CATEGORIES_LIST.map((cat) => {
+            {categoriesList.map((cat) => {
               const isActive = category === cat.id;
               return (
                 <button
@@ -367,7 +409,7 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
               <div className="space-y-2">
                 <label className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Category</label>
                 <div className="flex flex-col gap-1.5 mt-2">
-                  {CATEGORIES_LIST.map((cat) => (
+                  {categoriesList.map((cat) => (
                     <button
                       key={cat.id}
                       onClick={() => setCategory(cat.id)}
@@ -522,7 +564,7 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
                 )}
                 {category !== "all" && (
                   <span className="flex items-center gap-1 bg-white/5 border border-white/10 px-2.5 py-1 rounded-md text-xs text-[#9EFF00]">
-                    Category: {CATEGORY_MAP[category]?.title || category}
+                    Category: {categoryMap[category]?.title || category}
                     <button onClick={() => setCategory("all")} className="hover:text-white ml-1">
                       <X className="w-3 h-3" />
                     </button>
@@ -610,7 +652,7 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
               ) : (
                 Object.keys(groupedProducts).map((catKey) => {
                   const catId = catKey as ProductCategory;
-                  const catData = CATEGORY_MAP[catId];
+                  const catData = categoryMap[catId];
                   const products = groupedProducts[catId];
 
                   // Hide sections with no products to clean up UI when filtering
@@ -754,7 +796,7 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
                 <div className="space-y-2">
                   <label className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Category</label>
                   <div className="flex flex-col gap-1.5 mt-2">
-                    {CATEGORIES_LIST.map((cat) => (
+                    {categoriesList.map((cat) => (
                       <button
                         key={cat.id}
                         onClick={() => {

@@ -1,7 +1,9 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion, type Variants } from "framer-motion";
 import { useCategoryStore } from "@/store/categoryStore";
+import { useProductsQuery } from "@/hooks/useProducts";
 import {
   Monitor,
   Smartphone,
@@ -19,7 +21,7 @@ interface Category {
   icon: LucideIcon;
 }
 
-const categories: Category[] = [
+const fallbackCategories: Category[] = [
   { name: "Electrical Appliances", slug: "electrical-appliances", icon: Zap },
   { name: "Electronics", slug: "electronics", icon: Monitor },
   { name: "Mobile Accessories", slug: "mobile-accessories", icon: Smartphone },
@@ -43,6 +45,39 @@ const cardVariants: Variants = {
 
 export default function CategorySection() {
   const { selectedCategory, setSelectedCategory } = useCategoryStore();
+  const { data } = useProductsQuery({ limit: 1000 });
+  const backendProducts = data?.products ?? [];
+
+  const categories = useMemo(() => {
+    if (backendProducts.length === 0) return fallbackCategories;
+
+    const categoriesSet = new Set<string>();
+    backendProducts.forEach((p) => {
+      if (p.category) {
+        categoriesSet.add(p.category);
+      }
+    });
+
+    const iconMap: Record<string, LucideIcon> = {
+      "electrical-appliances": Zap,
+      "electronics": Monitor,
+      "mobile-accessories": Smartphone,
+      "computer-accessories": Laptop,
+      "chargers": BatteryCharging,
+      "earphones": Headphones,
+      "smart-devices": Cpu,
+    };
+
+    return Array.from(categoriesSet).sort().map((slug) => {
+      const icon = iconMap[slug] || Cpu;
+      const fallbackCat = fallbackCategories.find((c) => c.slug === slug);
+      const name = fallbackCat ? fallbackCat.name : slug
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+      return { name, slug, icon };
+    });
+  }, [backendProducts]);
 
   const handleCategoryClick = (slug: string) => {
     setSelectedCategory(selectedCategory === slug ? null : slug);

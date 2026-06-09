@@ -3,6 +3,15 @@ import { apiClient } from "@/services/api";
 import { generateSlug } from "@/lib/utils";
 import type { Product, ProductCategory } from "@/types";
 
+function buildBackendImageUrl(url: string | undefined): string {
+  if (!url) return "/images/placeholder-product.svg";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  
+  const cleanUrl = url.startsWith("/") ? url : `/${url}`;
+  const base = "https://al-kimath-backend.onrender.com";
+  return `${base}${cleanUrl}`;
+}
+
 export interface ProductApiRecord {
   id: string;
   slug?: string;
@@ -13,7 +22,7 @@ export interface ProductApiRecord {
   price: number;
   originalPrice?: number;
   stock: number;
-  images?: string[];
+  images?: any[];
   brand?: string;
   rating?: number;
   reviewCount?: number;
@@ -69,9 +78,17 @@ function normalizeSlug(product: ProductApiRecord, productId: string) {
   return product.slug || `${generateSlug(product.name || "product")}-${productId}`;
 }
 
-export function normalizeProduct(product: ProductApiRecord): Product {
-  const productId = product.id || product.slug || generateSlug(product.name || "product");
+export function normalizeProduct(product: any): Product {
+  const productId = product._id || product.id || product.slug || generateSlug(product.name || "product");
   const description = product.description || "";
+
+  const rawImages = product.images || [];
+  const images = rawImages.length
+    ? rawImages.map((img: any) => {
+        const url = typeof img === "object" && img !== null ? img.url : img;
+        return buildBackendImageUrl(url);
+      })
+    : ["/images/placeholder-product.svg"];
 
   return {
     id: productId,
@@ -83,7 +100,7 @@ export function normalizeProduct(product: ProductApiRecord): Product {
     originalPrice: product.originalPrice,
     category: product.category,
     brand: product.brand || "AL HIKMATH",
-    images: product.images?.length ? product.images : ["/images/placeholder-product.svg"],
+    images: images,
     rating: product.rating ?? 0,
     reviewCount: product.reviewCount ?? 0,
     stock: product.stock ?? 0,
