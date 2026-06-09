@@ -199,7 +199,20 @@ export async function getProduct(identifier: string): Promise<Product | null> {
     }
   })();
 
-  for (const basePath of DETAIL_PATHS(decodedIdentifier)) {
+  const resolveId = (ident: string): string => {
+    if (/^[a-f0-9]{24}$/i.test(ident)) {
+      return ident;
+    }
+    const match = ident.match(/-([a-f0-9]{24})$/i);
+    if (match) {
+      return match[1];
+    }
+    return ident;
+  };
+
+  const realId = resolveId(decodedIdentifier);
+
+  for (const basePath of DETAIL_PATHS(realId)) {
     try {
       const response = await apiClient.get<ProductApiRecord | ProductApiRecord[] | { product?: ProductApiRecord }>(basePath);
       const payload = response.data;
