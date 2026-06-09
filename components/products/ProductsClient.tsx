@@ -43,8 +43,8 @@ const CATEGORY_MAP: Record<ProductCategory, { title: string; desc: string }> = {
     desc: "Advanced consumer electronics, audio systems, and measurement tools.",
   },
   "electrical-appliances": {
-    title: "Technology Solutions",
-    desc: "Computing essentials, IT accessories, networking gear, and practical tech solutions.",
+    title: "Electrical Appliances",
+    desc: "Home utility products, power extensions, and energy-efficient lighting.",
   },
   "computer-accessories": {
     title: "Computer Accessories",
@@ -68,7 +68,7 @@ const CATEGORIES_LIST: { id: ProductCategory | "all"; label: string }[] = [
   { id: "all", label: "All Products" },
   { id: "mobile-accessories", label: "Mobile Accessories" },
   { id: "electronics", label: "Electronics" },
-  { id: "electrical-appliances", label: "Technology Solutions" },
+  { id: "electrical-appliances", label: "Electrical Appliances" },
   { id: "computer-accessories", label: "Computer Accessories" },
   { id: "chargers", label: "Chargers" },
   { id: "earphones", label: "Earphones" },

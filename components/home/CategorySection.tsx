@@ -9,6 +9,7 @@ import {
   BatteryCharging,
   Headphones,
   Cpu,
+  Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -19,7 +20,7 @@ interface Category {
 }
 
 const categories: Category[] = [
-  { name: "Technology Solutions", slug: "electrical-appliances", icon: Cpu },
+  { name: "Electrical Appliances", slug: "electrical-appliances", icon: Zap },
   { name: "Electronics", slug: "electronics", icon: Monitor },
   { name: "Mobile Accessories", slug: "mobile-accessories", icon: Smartphone },
   { name: "Computer Accessories", slug: "computer-accessories", icon: Laptop },
@@ -66,9 +67,8 @@ export default function CategorySection() {
             </span>
           </h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-xl mx-auto">
-            Browse our wide range of electronics, computers, IT accessories,
-            networking products, and technology solutions across all
-            categories.
+            Browse our wide range of electrical and electronics products across
+            all categories.
           </p>
         </div>
 

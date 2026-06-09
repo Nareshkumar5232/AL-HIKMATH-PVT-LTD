@@ -20,18 +20,16 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "AL HIKMATH ENTERPRISES PVT LTD | Electronics, Computers & IT Products",
+    default: "AL HIKMATH ENTERPRISES PVT LTD | Premium Electrical & Electronics",
     template: "%s | AL HIKMATH ENTERPRISES",
   },
   description:
-    "Shop electronics, computers, IT accessories, networking products, and technology solutions at AL HIKMATH ENTERPRISES PVT LTD. Quality products, genuine brands, fast delivery across Chennai.",
+    "Shop premium electrical and electronics appliances at AL HIKMATH ENTERPRISES PVT LTD. Quality products, genuine brands, fast delivery across Chennai.",
   keywords: [
-    "electronics products",
-    "computer products",
-    "it products",
-    "technology solutions",
-    "it accessories",
-    "networking products",
+    "electrical appliances",
+    "electronics",
+    "mobile accessories",
+    "computer accessories",
     "Chennai",
     "AL HIKMATH",
   ],
@@ -42,9 +40,9 @@ export const metadata: Metadata = {
     locale: "en_IN",
     url: "https://alhikmath.com",
     siteName: "AL HIKMATH ENTERPRISES",
-    title: "AL HIKMATH ENTERPRISES PVT LTD | Electronics, Computers & IT Products",
+    title: "AL HIKMATH ENTERPRISES PVT LTD | Premium Electrical & Electronics",
     description:
-      "Shop electronics, computers, IT accessories, networking products, and technology solutions at AL HIKMATH ENTERPRISES PVT LTD.",
+      "Shop premium electrical and electronics appliances at AL HIKMATH ENTERPRISES PVT LTD.",
     images: [
       {
         url: "/og-image.jpg",
@@ -57,7 +55,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "AL HIKMATH ENTERPRISES PVT LTD",
-    description: "Electronics, Computers & IT Products",
+    description: "Premium Electrical & Electronics Appliances",
   },
   alternates: {
     canonical: "https://alhikmath.com",
