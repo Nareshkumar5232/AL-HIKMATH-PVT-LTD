@@ -5,19 +5,28 @@ import { Phone, MapPin, Mail, MessageCircle } from "lucide-react";
 const quickLinks = [
   { label: "Home", href: "/" },
   { label: "Products", href: "/products" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  { label: "About Us", href: "/about" },
+  { label: "Contact Us", href: "/contact" },
   { label: "Cart", href: "/cart" },
+  { label: "Wishlist", href: "/wishlist" },
+];
+
+const legalLinks = [
+  { label: "Terms & Conditions", href: "/terms-and-conditions" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Refund & Cancellation", href: "/refund-cancellation-policy" },
+  { label: "Delivery & Shipping", href: "/delivery-shipping-policy" },
 ];
 
 const contactDetails = [
-  { icon: Phone, text: "+91 9342698344" },
-  { icon: Phone, text: "+91 9342798344" },
+  { icon: Phone, text: "+91 9342698344", href: "tel:+919342698344" },
+  { icon: Phone, text: "+91 9342798344", href: "tel:+919342798344" },
   {
     icon: MapPin,
-    text: "No. 16/127, Inbharajapuram 1st Street, Bajanai Kovil Street, Choolaimedu - 600094, Chennai",
+    text: "No. 16/127, Inbharajapuram 1st Street, Bajanai Kovil Street, Choolaimedu – 600094, Chennai",
+    href: null,
   },
-  { icon: Mail, text: "care@alhikmath.com" },
+  { icon: Mail, text: "care@alhikmath.com", href: "mailto:care@alhikmath.com" },
 ];
 
 const socialLinks = [
@@ -51,56 +60,8 @@ export default function Footer() {
             appliances in Chennai. Quality products, genuine brands, expert
             support.
           </p>
-        </div>
-
-        {/* Column 2 — Quick Links */}
-        <div>
-          <h3 className="text-[#9EFF00] font-semibold text-base uppercase tracking-wider mb-4 pb-2 border-b border-[#9EFF00]/40">
-            Quick Links
-          </h3>
-          <ul className="flex flex-col gap-2">
-            {quickLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-gray-400 text-sm hover:text-[#9EFF00] transition-colors duration-200"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Column 3 — Contact Details */}
-        <div>
-          <h3 className="text-[#9EFF00] font-semibold text-base uppercase tracking-wider mb-4 pb-2 border-b border-[#9EFF00]/40">
-            Contact Us
-          </h3>
-          <ul className="flex flex-col gap-3">
-            {contactDetails.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <li key={index} className="flex items-start gap-2">
-                  <Icon
-                    className="w-4 h-4 text-[#9EFF00] mt-0.5 shrink-0"
-                    aria-hidden="true"
-                  />
-                  <span className="text-gray-400 text-sm leading-snug">
-                    {item.text}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        {/* Column 4 — Social Media */}
-        <div>
-          <h3 className="text-[#9EFF00] font-semibold text-base uppercase tracking-wider mb-4 pb-2 border-b border-[#9EFF00]/40">
-            Follow Us
-          </h3>
-          <ul className="flex flex-col gap-3">
+          {/* Social */}
+          <ul className="flex flex-col gap-3 mt-2">
             {socialLinks.map((social) => {
               const Icon = social.icon;
               return (
@@ -124,15 +85,100 @@ export default function Footer() {
             })}
           </ul>
         </div>
+
+        {/* Column 2 — Quick Links */}
+        <div>
+          <h3 className="text-[#9EFF00] font-semibold text-base uppercase tracking-wider mb-4 pb-2 border-b border-[#9EFF00]/40">
+            Quick Links
+          </h3>
+          <ul className="flex flex-col gap-2">
+            {quickLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-gray-400 text-sm hover:text-[#9EFF00] transition-colors duration-200"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Column 3 — Legal */}
+        <div>
+          <h3 className="text-[#9EFF00] font-semibold text-base uppercase tracking-wider mb-4 pb-2 border-b border-[#9EFF00]/40">
+            Legal
+          </h3>
+          <ul className="flex flex-col gap-2">
+            {legalLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-gray-400 text-sm hover:text-[#9EFF00] transition-colors duration-200"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Column 4 — Contact Details */}
+        <div>
+          <h3 className="text-[#9EFF00] font-semibold text-base uppercase tracking-wider mb-4 pb-2 border-b border-[#9EFF00]/40">
+            Contact Us
+          </h3>
+          <ul className="flex flex-col gap-3">
+            {contactDetails.map((item, index) => {
+              const Icon = item.icon;
+              const content = (
+                <li key={index} className="flex items-start gap-2">
+                  <Icon
+                    className="w-4 h-4 text-[#9EFF00] mt-0.5 shrink-0"
+                    aria-hidden="true"
+                  />
+                  <span className="text-gray-400 text-sm leading-snug">
+                    {item.text}
+                  </span>
+                </li>
+              );
+
+              if (item.href) {
+                return (
+                  <a
+                    key={index}
+                    href={item.href}
+                    className="hover:text-[#9EFF00] transition-colors"
+                  >
+                    {content}
+                  </a>
+                );
+              }
+              return content;
+            })}
+          </ul>
+        </div>
       </div>
 
       {/* Bottom bar */}
       <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
+        <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
           <p>
             &copy; {new Date().getFullYear()} AL HIKMATH ENTERPRISES PVT LTD.
             All rights reserved.
           </p>
+          <div className="flex flex-wrap items-center gap-3 justify-center">
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="hover:text-[#9EFF00] transition-colors text-xs"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
           <p>Made with ❤️ in Chennai</p>
         </div>
       </div>
