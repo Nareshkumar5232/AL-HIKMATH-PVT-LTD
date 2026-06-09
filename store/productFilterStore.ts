@@ -32,7 +32,7 @@ interface ProductFilterStore {
 const initialFilters = {
   searchQuery: "",
   category: "all" as ProductCategory | "all",
-  priceRange: [0, 20000] as [number, number],
+  priceRange: [0, 200000] as [number, number],
   minRating: 0,
   availability: "all" as "all" | "in-stock",
   newArrivalsOnly: false,

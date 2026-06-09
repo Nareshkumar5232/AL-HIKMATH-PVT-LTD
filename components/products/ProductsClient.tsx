@@ -294,7 +294,7 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
     let count = 0;
     if (searchQuery) count++;
     if (category !== "all") count++;
-    if (priceRange[0] !== 0 || priceRange[1] !== 20000) count++;
+    if (priceRange[0] !== 0 || priceRange[1] !== 200000) count++;
     if (minRating > 0) count++;
     if (availability !== "all") count++;
     if (newArrivalsOnly) count++;
@@ -435,15 +435,15 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
                 <input
                   type="range"
                   min="0"
-                  max="20000"
-                  step="500"
+                  max="200000"
+                  step="1000"
                   value={priceInput}
                   onChange={handlePriceChange}
                   className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#9EFF00]"
                 />
                 <div className="flex justify-between text-[10px] text-gray-500 font-mono">
                   <span>₹0</span>
-                  <span>₹20,000+</span>
+                  <span>₹200,000+</span>
                 </div>
               </div>
 
@@ -570,10 +570,10 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
                     </button>
                   </span>
                 )}
-                {(priceRange[0] !== 0 || priceRange[1] !== 20000) && (
+                {(priceRange[0] !== 0 || priceRange[1] !== 200000) && (
                   <span className="flex items-center gap-1 bg-white/5 border border-white/10 px-2.5 py-1 rounded-md text-xs text-white">
                     Max Price: {formatCurrency(priceRange[1])}
-                    <button onClick={() => setPriceRange([0, 20000])} className="hover:text-[#9EFF00] ml-1">
+                    <button onClick={() => setPriceRange([0, 200000])} className="hover:text-[#9EFF00] ml-1">
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -826,15 +826,15 @@ export default function ProductsClient({ initialSearchQuery = "" }: ProductsClie
                   <input
                     type="range"
                     min="0"
-                    max="20000"
-                    step="500"
+                    max="200000"
+                    step="1000"
                     value={priceInput}
                     onChange={handlePriceChange}
                     className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#9EFF00]"
                   />
                   <div className="flex justify-between text-[10px] text-gray-500 font-mono">
                     <span>₹0</span>
-                    <span>₹20,000+</span>
+                    <span>₹200,000+</span>
                   </div>
                 </div>
 
