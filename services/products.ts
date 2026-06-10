@@ -3,6 +3,65 @@ import { apiClient } from "@/services/api";
 import { generateSlug } from "@/lib/utils";
 import type { Product, ProductCategory } from "@/types";
 
+// Memory cache implementation for server-side rendering (SSR) and client-side axios caching
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+class MemoryCache {
+  private cache = new Map<string, CacheEntry<any>>();
+  private ttl: number;
+
+  constructor(ttlMs: number = 1000 * 60 * 5) { // default 5 minutes
+    this.ttl = ttlMs;
+  }
+
+  get<T>(key: string): T | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+
+    const isExpired = Date.now() - entry.timestamp > this.ttl;
+    if (isExpired) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return entry.data;
+  }
+
+  set<T>(key: string, data: T): void {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now()
+    });
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+export const serverCache = new MemoryCache(1000 * 60 * 5); // 5 minutes TTL
+
+function clearClientCache() {
+  if (typeof window !== "undefined") {
+    try {
+      const keys = Object.keys(localStorage);
+      keys.forEach((key) => {
+        if (
+          key.startsWith("al-hikmath-products-cache-") ||
+          key.startsWith("al-hikmath-product-detail-")
+        ) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (e) {
+      console.warn("Failed to clear localStorage product cache:", e);
+    }
+  }
+}
+
 function buildBackendImageUrl(url: string | undefined): string {
   if (!url) return "/images/placeholder-product.svg";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
@@ -167,6 +226,12 @@ async function requestWithFallback<T>(paths: string[], options?: { method?: "GET
 }
 
 export async function getProducts(filters: ProductQueryFilters = {}): Promise<ProductListResponse> {
+  const cacheKey = `getProducts-${JSON.stringify(filters)}`;
+  const cached = serverCache.get<ProductListResponse>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const query: Record<string, string | number | boolean | undefined> = {
     category: filters.category && filters.category !== "all" ? filters.category : undefined,
     search: filters.search?.trim() || undefined,
@@ -187,10 +252,18 @@ export async function getProducts(filters: ProductQueryFilters = {}): Promise<Pr
 
   const paths = COLLECTION_PATHS.map((path) => (queryString ? `${path}?${queryString}` : path));
   const payload = await requestWithFallback<unknown>(paths, { method: "GET" });
-  return normalizeListResponse(payload);
+  const result = normalizeListResponse(payload);
+  serverCache.set(cacheKey, result);
+  return result;
 }
 
 export async function getProduct(identifier: string): Promise<Product | null> {
+  const cacheKey = `getProduct-${identifier}`;
+  const cached = serverCache.get<Product | null>(cacheKey);
+  if (cached !== null) {
+    return cached;
+  }
+
   const decodedIdentifier = (() => {
     try {
       return decodeURIComponent(identifier);
@@ -218,13 +291,19 @@ export async function getProduct(identifier: string): Promise<Product | null> {
       const payload = response.data;
       if (Array.isArray(payload)) {
         const first = payload[0];
-        return first ? normalizeProduct(first) : null;
+        const result = first ? normalizeProduct(first) : null;
+        serverCache.set(cacheKey, result);
+        return result;
       }
       if (payload && typeof payload === "object" && "product" in payload && payload.product) {
-        return normalizeProduct(payload.product);
+        const result = normalizeProduct(payload.product);
+        serverCache.set(cacheKey, result);
+        return result;
       }
       if (payload && typeof payload === "object" && "id" in payload) {
-        return normalizeProduct(payload as ProductApiRecord);
+        const result = normalizeProduct(payload as ProductApiRecord);
+        serverCache.set(cacheKey, result);
+        return result;
       }
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -249,10 +328,15 @@ export async function getProduct(identifier: string): Promise<Product | null> {
     );
   });
 
-  return matched ? normalizeProduct(matched) : null;
+  const result = matched ? normalizeProduct(matched) : null;
+  serverCache.set(cacheKey, result);
+  return result;
 }
 
+
 export async function createProduct(product: ProductMutationPayload): Promise<Product> {
+  serverCache.clear();
+  clearClientCache();
   const response = await requestWithFallback<ProductApiRecord>(COLLECTION_PATHS, {
     method: "POST",
     data: product,
@@ -261,6 +345,8 @@ export async function createProduct(product: ProductMutationPayload): Promise<Pr
 }
 
 export async function updateProduct(id: string, product: Partial<ProductMutationPayload>): Promise<Product> {
+  serverCache.clear();
+  clearClientCache();
   const response = await requestWithFallback<ProductApiRecord>(DETAIL_PATHS(id), {
     method: "PUT",
     data: product,
@@ -269,12 +355,16 @@ export async function updateProduct(id: string, product: Partial<ProductMutation
 }
 
 export async function deleteProduct(id: string): Promise<{ success: boolean }> {
+  serverCache.clear();
+  clearClientCache();
   return requestWithFallback<{ success: boolean }>(DETAIL_PATHS(id), {
     method: "DELETE",
   });
 }
 
 export async function uploadProductImages(productId: string, files: File[]): Promise<{ images: string[] }> {
+  serverCache.clear();
+  clearClientCache();
   const formData = new FormData();
   formData.append("productId", productId);
   files.forEach((file) => formData.append("images", file));
@@ -284,3 +374,4 @@ export async function uploadProductImages(productId: string, files: File[]): Pro
     data: formData,
   });
 }
+
