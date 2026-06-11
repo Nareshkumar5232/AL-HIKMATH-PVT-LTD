@@ -10,16 +10,30 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { useEffect, useState } from "react";
+import { settingsService } from "@/services/settings";
 
 export default function CartClient() {
   const { items, updateQuantity, removeItem, subtotal } = useCartStore();
   const [mounted, setMounted] = useState(false);
+  const [shippingFee, setShippingFee] = useState<number>(0);
   const router = useRouter();
 
   useEffect(() => {
     // This effect intentionally sets mounted after hydration
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
+
+    async function loadSettings() {
+      try {
+        const settings = await settingsService.getSettings();
+        if (settings && typeof settings.shippingFee === 'number') {
+          setShippingFee(settings.shippingFee);
+        }
+      } catch (err) {
+        console.error("Failed to load settings in cart:", err);
+      }
+    }
+    loadSettings();
   }, []);
 
   if (!mounted) return null;
@@ -41,7 +55,7 @@ export default function CartClient() {
     );
   }
 
-  const total = subtotal();
+  const total = subtotal() + shippingFee;
 
   return (
     <div className="min-h-screen pt-24 pb-12 bg-gray-50 dark:bg-[#0F0F0F] transition-colors duration-300">
@@ -130,7 +144,7 @@ export default function CartClient() {
 
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span className="text-[#9EFF00]">Free</span>
+                  <span className="text-[#9EFF00]">{shippingFee === 0 ? "Free" : formatCurrency(shippingFee)}</span>
                 </div>
                 
                 <div className="border-t border-gray-200 dark:border-white/10 pt-3 mt-3">

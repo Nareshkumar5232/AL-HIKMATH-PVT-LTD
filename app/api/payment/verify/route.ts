@@ -11,9 +11,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json() as VerificationData;
     const { orderId, paymentSessionId } = body;
 
-    if (!orderId || !paymentSessionId) {
+    if (!orderId) {
       return NextResponse.json(
-        { error: "Missing required fields for verification" },
+        { error: "Missing orderId field for verification" },
         { status: 400 }
       );
     }
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // Verify payment with Cashfree
     const response = await fetch(
-      `${baseUrl}/orders/${orderId}/payments/${paymentSessionId}`,
+      `${baseUrl}/orders/${orderId}/payments`,
       {
         method: "GET",
         headers: {
@@ -51,16 +51,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const paymentData = await response.json();
+    const payments = await response.json();
+    let isSuccessful = false;
+    let paymentData: any = {};
 
-    const isSuccessful = paymentData.payment_status === "SUCCESS";
+    if (Array.isArray(payments)) {
+      const successPayment = payments.find(p => p.payment_status === "SUCCESS");
+      if (successPayment) {
+        isSuccessful = true;
+        paymentData = successPayment;
+      } else if (payments.length > 0) {
+        paymentData = payments[0];
+      }
+    } else if (payments && typeof payments === 'object') {
+      isSuccessful = payments.payment_status === "SUCCESS";
+      paymentData = payments;
+    }
 
     return NextResponse.json({
       success: isSuccessful,
-      orderId: paymentData.order_id,
+      orderId: paymentData.order_id || orderId,
       paymentId: paymentData.cf_payment_id,
       amount: paymentData.order_amount,
-      status: paymentData.payment_status,
+      status: paymentData.payment_status || "PENDING",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

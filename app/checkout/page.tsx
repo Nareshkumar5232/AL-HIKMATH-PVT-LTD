@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import { useCartStore } from "@/store/cartStore";
 import { ShoppingCart, MapPin, CreditCard, Truck } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { apiClient } from "@/services/api";
+import { settingsService } from "@/services/settings";
 
 // Form validation schema
 const checkoutSchema = z.object({
@@ -59,6 +60,22 @@ export default function CheckoutPage() {
   const cartItems = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shipping, setShipping] = useState<number>(0);
+
+  // Fetch store settings for shipping fee on mount
+  useEffect(() => {
+    async function loadShipping() {
+      try {
+        const settings = await settingsService.getSettings();
+        if (settings && typeof settings.shippingFee === 'number') {
+          setShipping(settings.shippingFee);
+        }
+      } catch (error) {
+        console.error("Failed to load store settings for checkout:", error);
+      }
+    }
+    loadShipping();
+  }, []);
 
   const { register, handleSubmit, formState: { errors }, watch } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -94,7 +111,6 @@ export default function CheckoutPage() {
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-  const shipping = subtotal > 5000 ? 0 : 149;
   const total = subtotal + shipping;
 
   async function onSubmit(data: CheckoutFormData) {
@@ -139,40 +155,105 @@ export default function CheckoutPage() {
 
       if (data.paymentMethod === "online") {
         // If backend returned a direct redirect URL/payment link
-        const redirectUrl = createdOrder.paymentLink || createdOrder.payment_link || createdOrder.redirectUrl || createdOrder.redirect_url;
-        if (redirectUrl) {
-          toast.success("Redirecting to payment gateway...");
-          window.location.href = redirectUrl;
-          return;
-        }
+        let redirectUrl = createdOrder.paymentLink || createdOrder.payment_link || createdOrder.redirectUrl || createdOrder.redirect_url;
+        let paymentSessionId = createdOrder.paymentSessionId || createdOrder.payment_session_id || createdOrder.payment_session?.payment_session_id;
 
-        // If backend returned a payment session ID
-        const paymentSessionId = createdOrder.paymentSessionId || createdOrder.payment_session_id || createdOrder.payment_session?.payment_session_id;
-        if (paymentSessionId) {
-          const CashfreeSDK = await loadCashfreeScript();
-          if (!CashfreeSDK) {
-            toast.error("Failed to load payment gateway. Please contact support.");
+        // If not returned by backend, initiate payment via our local API process route
+        if (!redirectUrl && !paymentSessionId) {
+          try {
+            toast.loading("Initiating payment session...", { id: "payment-init" });
+            const paymentReqPayload = {
+              orderId: confirmationOrderId,
+              amount: total,
+              email: user.email,
+              phone: data.mobileNumber,
+              customerName: data.fullName,
+              productInfo: cartItems.map(item => item.product.name).join(", "),
+            };
+
+            const paymentRes = await fetch("/api/payment/process", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(paymentReqPayload),
+            });
+
+            if (!paymentRes.ok) {
+              const errText = await paymentRes.text();
+              throw new Error(errText || "Failed to initialize payment session");
+            }
+
+            const paymentData = await paymentRes.json();
+            toast.dismiss("payment-init");
+
+            if (paymentData.success) {
+              paymentSessionId = paymentData.paymentSessionId;
+              redirectUrl = paymentData.redirectUrl;
+              const paymentMode = paymentData.paymentMode || "production";
+              
+              if (redirectUrl) {
+                toast.success("Redirecting to payment gateway...");
+                window.location.href = redirectUrl;
+                return;
+              }
+
+              if (paymentSessionId) {
+                const CashfreeSDK = await loadCashfreeScript();
+                if (!CashfreeSDK) {
+                  toast.error("Failed to load payment gateway. Please contact support.");
+                  return;
+                }
+
+                toast.success("Opening payment gateway...");
+                const cashfree = CashfreeSDK({
+                  mode: paymentMode,
+                });
+
+                cashfree.checkout({
+                  paymentSessionId,
+                  redirectTarget: "_self"
+                });
+                return;
+              }
+            } else {
+              throw new Error(paymentData.error || "Payment session initialization failed");
+            }
+          } catch (payError: any) {
+            console.error("Payment initiation failed:", payError);
+            toast.dismiss("payment-init");
+            toast.error(`Payment gateway initialization failed: ${payError.message || "Please check credentials"}`);
+            return;
+          }
+        } else {
+          // If backend did return redirection details directly
+          if (redirectUrl) {
+            toast.success("Redirecting to payment gateway...");
+            window.location.href = redirectUrl;
             return;
           }
 
-          toast.success("Opening payment gateway...");
-          
-          // Determine mode based on API URL or hostname
-          const isSandbox = process.env.NEXT_PUBLIC_API_URL?.includes("sandbox") || 
-                            window.location.hostname === "localhost";
-          const cashfree = CashfreeSDK({
-            mode: isSandbox ? "sandbox" : "production",
-          });
+          if (paymentSessionId) {
+            const CashfreeSDK = await loadCashfreeScript();
+            if (!CashfreeSDK) {
+              toast.error("Failed to load payment gateway. Please contact support.");
+              return;
+            }
 
-          cashfree.checkout({
-            paymentSessionId,
-            redirectTarget: "_self"
-          });
-          return;
+            toast.success("Opening payment gateway...");
+            const isSandbox = process.env.NEXT_PUBLIC_API_URL?.includes("sandbox") || 
+                              window.location.hostname === "localhost";
+            const cashfree = CashfreeSDK({
+              mode: isSandbox ? "sandbox" : "production",
+            });
+
+            cashfree.checkout({
+              paymentSessionId,
+              redirectTarget: "_self"
+            });
+            return;
+          }
         }
-
-        // Fallback if online payment was requested but session/link is missing
-        toast.warning("Payment redirection could not be initiated automatically. Order placed as pending.");
       }
 
       toast.success(`Order placed successfully!`);
@@ -401,7 +482,6 @@ export default function CheckoutPage() {
                   </span>
                   <span>{shipping === 0 ? "FREE" : formatCurrency(shipping)}</span>
                 </div>
-                {shipping === 0 && <p className="text-xs text-[#9EFF00] font-medium">Free shipping on orders above ₹5000</p>}
                 <div className="pt-3 border-t border-gray-200 dark:border-white/10 flex justify-between font-bold text-lg text-gray-900 dark:text-white">
                   <span>Total</span>
                   <span className="text-[#9EFF00]">{formatCurrency(total)}</span>

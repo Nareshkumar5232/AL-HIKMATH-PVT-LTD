@@ -100,12 +100,15 @@ export async function POST(request: NextRequest) {
     }
 
     const paymentOrder = await response.json();
+    const isSandbox = baseUrl.includes("sandbox");
+    const paymentMode = isSandbox ? "sandbox" : "production";
 
     return NextResponse.json({
       success: true,
       orderId: paymentOrder.order_id,
       paymentSessionId: paymentOrder.payment_session_id,
       redirectUrl: paymentOrder.redemption_reference_id,
+      paymentMode,
     });
   } catch (error) {
     console.error("Payment processing error:", error);

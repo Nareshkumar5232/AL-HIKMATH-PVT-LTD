@@ -33,6 +33,60 @@ export default function OrderConfirmationPage() {
     // Clear cart immediately upon landing on confirmation page, since the order has been created
     clearCart();
 
+    const sessionId = searchParams.get("session_id") || "";
+
+    const verifyOnlinePayment = async () => {
+      try {
+        setStatus("verifying");
+        const verifyRes = await fetch("/api/payment/verify", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderId,
+            paymentSessionId: sessionId,
+          }),
+        });
+
+        if (!verifyRes.ok) {
+          throw new Error("Failed to verify payment with Cashfree");
+        }
+
+        const verifyData = await verifyRes.json();
+        if (verifyData.success) {
+          // Update order status on backend
+          try {
+            await apiClient.put(`/orders/${orderId}/status`, { status: "confirmed" });
+          } catch (statusErr) {
+            console.warn("Failed to update status via /orders/:id/status, trying /orders/:id...", statusErr);
+            try {
+              await apiClient.put(`/orders/${orderId}`, { status: "confirmed" });
+            } catch (err2) {
+              console.error("Failed to update order status:", err2);
+            }
+          }
+          if (isMounted) {
+            setStatus("success");
+            setLoading(false);
+          }
+        } else {
+          if (isMounted) {
+            setStatus("error");
+            setErrorMessage("Payment verification failed. Please check your bank transaction.");
+            setLoading(false);
+          }
+        }
+      } catch (err: any) {
+        console.error("Verification error:", err);
+        if (isMounted) {
+          setStatus("error");
+          setErrorMessage(err.message || "An error occurred while verifying payment.");
+          setLoading(false);
+        }
+      }
+    };
+
     const checkOrderPaymentStatus = async () => {
       try {
         const response = await apiClient.get(`/orders/${orderId}`);
@@ -85,13 +139,17 @@ export default function OrderConfirmationPage() {
       }
     };
 
-    checkOrderPaymentStatus();
+    if (sessionId) {
+      verifyOnlinePayment();
+    } else {
+      checkOrderPaymentStatus();
+    }
 
     return () => {
       isMounted = false;
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [orderId, clearCart]);
+  }, [orderId, searchParams, clearCart]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0F0F0F] pt-24 pb-16 flex items-center justify-center px-4">
