@@ -28,6 +28,31 @@ const checkoutSchema = z.object({
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
+// Helper to dynamically load Cashfree SDK script
+const loadCashfreeScript = (): Promise<any> => {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined") {
+      resolve(null);
+      return;
+    }
+    if ((window as any).Cashfree) {
+      resolve((window as any).Cashfree);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+    script.async = true;
+    script.onload = () => {
+      resolve((window as any).Cashfree);
+    };
+    script.onerror = () => {
+      console.error("Failed to load Cashfree SDK script");
+      resolve(null);
+    };
+    document.body.appendChild(script);
+  });
+};
+
 export default function CheckoutPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -70,8 +95,7 @@ export default function CheckoutPage() {
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   const shipping = subtotal > 5000 ? 0 : 149;
-  const tax = Math.round(subtotal * 0.05); // 5% tax
-  const total = subtotal + shipping + tax;
+  const total = subtotal + shipping;
 
   async function onSubmit(data: CheckoutFormData) {
     if (!user) {
@@ -111,7 +135,45 @@ export default function CheckoutPage() {
       const createdOrder = res.data;
 
       // Extract the order identifier
-      const confirmationOrderId = createdOrder.id || createdOrder.orderId || `ORD-${Date.now()}`;
+      const confirmationOrderId = createdOrder.id || createdOrder.orderId || createdOrder.order_id || `ORD-${Date.now()}`;
+
+      if (data.paymentMethod === "online") {
+        // If backend returned a direct redirect URL/payment link
+        const redirectUrl = createdOrder.paymentLink || createdOrder.payment_link || createdOrder.redirectUrl || createdOrder.redirect_url;
+        if (redirectUrl) {
+          toast.success("Redirecting to payment gateway...");
+          window.location.href = redirectUrl;
+          return;
+        }
+
+        // If backend returned a payment session ID
+        const paymentSessionId = createdOrder.paymentSessionId || createdOrder.payment_session_id || createdOrder.payment_session?.payment_session_id;
+        if (paymentSessionId) {
+          const CashfreeSDK = await loadCashfreeScript();
+          if (!CashfreeSDK) {
+            toast.error("Failed to load payment gateway. Please contact support.");
+            return;
+          }
+
+          toast.success("Opening payment gateway...");
+          
+          // Determine mode based on API URL or hostname
+          const isSandbox = process.env.NEXT_PUBLIC_API_URL?.includes("sandbox") || 
+                            window.location.hostname === "localhost";
+          const cashfree = CashfreeSDK({
+            mode: isSandbox ? "sandbox" : "production",
+          });
+
+          cashfree.checkout({
+            paymentSessionId,
+            redirectTarget: "_self"
+          });
+          return;
+        }
+
+        // Fallback if online payment was requested but session/link is missing
+        toast.warning("Payment redirection could not be initiated automatically. Order placed as pending.");
+      }
 
       toast.success(`Order placed successfully!`);
       clearCart();
@@ -332,10 +394,7 @@ export default function CheckoutPage() {
                   <span>Subtotal</span>
                   <span>{formatCurrency(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                  <span>Tax (5%)</span>
-                  <span>{formatCurrency(tax)}</span>
-                </div>
+
                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span className="flex items-center gap-1">
                     <Truck className="w-4 h-4" /> Shipping

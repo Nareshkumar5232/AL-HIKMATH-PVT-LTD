@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 export default function CartClient() {
   const { items, updateQuantity, removeItem, subtotal } = useCartStore();
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     // This effect intentionally sets mounted after hydration
@@ -40,8 +41,7 @@ export default function CartClient() {
     );
   }
 
-  const tax = subtotal() * 0.18;
-  const total = subtotal() + tax;
+  const total = subtotal();
 
   return (
     <div className="min-h-screen pt-24 pb-12 bg-gray-50 dark:bg-[#0F0F0F] transition-colors duration-300">
@@ -127,10 +127,7 @@ export default function CartClient() {
                   <span>Subtotal</span>
                   <span className="text-gray-900 dark:text-white font-medium">{formatCurrency(subtotal())}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Estimated Tax (18%)</span>
-                  <span className="text-gray-900 dark:text-white font-medium">{formatCurrency(tax)}</span>
-                </div>
+
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span className="text-[#9EFF00]">Free</span>
@@ -153,8 +150,7 @@ export default function CartClient() {
                     window.location.href = `/login?redirect=${redirect}`;
                     return;
                   }
-                  // proceed to checkout (placeholder)
-                  toast.success("Checkout implementation coming soon");
+                  router.push("/checkout");
                 }}
                 className="w-full bg-[#9EFF00] text-black font-bold py-3 px-4 rounded-lg mt-6 hover:bg-[#9EFF00]/90 transition-colors"
               >
