@@ -26,8 +26,8 @@ export default function CartClient() {
     async function loadSettings() {
       try {
         const settings = await settingsService.getSettings();
-        if (settings && typeof settings.shippingFee === 'number') {
-          setShippingFee(settings.shippingFee);
+        if (settings && typeof settings.shippingCost === 'number') {
+          setShippingFee(settings.shippingCost);
         }
       } catch (err) {
         console.error("Failed to load settings in cart:", err);

@@ -67,8 +67,8 @@ export default function CheckoutPage() {
     async function loadShipping() {
       try {
         const settings = await settingsService.getSettings();
-        if (settings && typeof settings.shippingFee === 'number') {
-          setShipping(settings.shippingFee);
+        if (settings && typeof settings.shippingCost === 'number') {
+          setShipping(settings.shippingCost);
         }
       } catch (error) {
         console.error("Failed to load store settings for checkout:", error);
@@ -147,7 +147,7 @@ export default function CheckoutPage() {
         shippingAddress: `${formattedAddress}. Phone: ${data.mobileNumber}`,
       };
 
-      const res = await apiClient.post("/orders", orderPayload);
+      const res = await apiClient.post("/order", orderPayload);
       const createdOrder = res.data;
 
       // Extract the order identifier
@@ -158,7 +158,7 @@ export default function CheckoutPage() {
         let redirectUrl = createdOrder.paymentLink || createdOrder.payment_link || createdOrder.redirectUrl || createdOrder.redirect_url;
         let paymentSessionId = createdOrder.paymentSessionId || createdOrder.payment_session_id || createdOrder.payment_session?.payment_session_id;
 
-        // If not returned by backend, initiate payment via our local API process route
+        // If not returned by backend, initiate payment via backend payment process route
         if (!redirectUrl && !paymentSessionId) {
           try {
             toast.loading("Initiating payment session...", { id: "payment-init" });
@@ -171,26 +171,17 @@ export default function CheckoutPage() {
               productInfo: cartItems.map(item => item.product.name).join(", "),
             };
 
-            const paymentRes = await fetch("/api/payment/process", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(paymentReqPayload),
-            });
-
-            if (!paymentRes.ok) {
-              const errText = await paymentRes.text();
-              throw new Error(errText || "Failed to initialize payment session");
-            }
-
-            const paymentData = await paymentRes.json();
+            const paymentRes = await apiClient.post("/payment/process", paymentReqPayload);
+            const paymentData = paymentRes.data;
             toast.dismiss("payment-init");
 
-            if (paymentData.success) {
+            if (paymentData && paymentData.paymentSessionId) {
               paymentSessionId = paymentData.paymentSessionId;
               redirectUrl = paymentData.redirectUrl;
-              const paymentMode = paymentData.paymentMode || "production";
+              
+              const isSandbox = process.env.NEXT_PUBLIC_API_URL?.includes("sandbox") || 
+                                window.location.hostname === "localhost";
+              const paymentMode = isSandbox ? "sandbox" : "production";
               
               if (redirectUrl) {
                 toast.success("Redirecting to payment gateway...");
@@ -217,12 +208,13 @@ export default function CheckoutPage() {
                 return;
               }
             } else {
-              throw new Error(paymentData.error || "Payment session initialization failed");
+              throw new Error("Payment session initialization failed: missing paymentSessionId");
             }
           } catch (payError: any) {
             console.error("Payment initiation failed:", payError);
             toast.dismiss("payment-init");
-            toast.error(`Payment gateway initialization failed: ${payError.message || "Please check credentials"}`);
+            const errorMsg = payError.response?.data?.error || payError.response?.data?.message || payError.message;
+            toast.error(`Payment gateway initialization failed: ${errorMsg || "Please check credentials"}`);
             return;
           }
         } else {

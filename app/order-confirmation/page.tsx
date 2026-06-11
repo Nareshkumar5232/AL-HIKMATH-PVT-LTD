@@ -38,34 +38,13 @@ export default function OrderConfirmationPage() {
     const verifyOnlinePayment = async () => {
       try {
         setStatus("verifying");
-        const verifyRes = await fetch("/api/payment/verify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            orderId,
-            paymentSessionId: sessionId,
-          }),
+        const verifyRes = await apiClient.post("/payment/verify", {
+          orderId,
+          paymentSessionId: sessionId,
         });
 
-        if (!verifyRes.ok) {
-          throw new Error("Failed to verify payment with Cashfree");
-        }
-
-        const verifyData = await verifyRes.json();
-        if (verifyData.success) {
-          // Update order status on backend
-          try {
-            await apiClient.put(`/orders/${orderId}/status`, { status: "confirmed" });
-          } catch (statusErr) {
-            console.warn("Failed to update status via /orders/:id/status, trying /orders/:id...", statusErr);
-            try {
-              await apiClient.put(`/orders/${orderId}`, { status: "confirmed" });
-            } catch (err2) {
-              console.error("Failed to update order status:", err2);
-            }
-          }
+        const verifyData = verifyRes.data;
+        if (verifyData && (verifyData.status === "paided" || verifyData.status === "used")) {
           if (isMounted) {
             setStatus("success");
             setLoading(false);
@@ -89,7 +68,7 @@ export default function OrderConfirmationPage() {
 
     const checkOrderPaymentStatus = async () => {
       try {
-        const response = await apiClient.get(`/orders/${orderId}`);
+        const response = await apiClient.get(`/order/${orderId}`);
         const order = response.data;
 
         if (!isMounted) return;

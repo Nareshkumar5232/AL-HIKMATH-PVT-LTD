@@ -8,7 +8,7 @@ export interface StoreSettings {
   gstin?: string;
   email?: string;
   website?: string;
-  shippingFee?: number;
+  shippingCost?: number;
 }
 
 export const settingsService = {
