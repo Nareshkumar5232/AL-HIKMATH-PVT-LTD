@@ -130,6 +130,18 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Validate that all cart items have valid MongoDB ObjectId product IDs
+    const invalidItems = cartItems.filter(
+      (item) => !item.product.id || !/^[a-f\d]{24}$/i.test(item.product.id)
+    );
+    if (invalidItems.length > 0) {
+      toast.error(
+        `Some cart items have invalid product IDs. Please remove them and re-add from the products page.`
+      );
+      console.error('[CHECKOUT] Invalid product IDs:', invalidItems.map(i => i.product.id));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // Map form details to backend expected body format
@@ -142,7 +154,7 @@ export default function CheckoutPage() {
       ].filter(Boolean).join(", ");
 
       const orderPayload = {
-        customerId: user.id || "guest",
+        customerId: user.id || undefined,
         customerName: data.fullName,
         customerEmail: user.email,
         products: cartItems.map((item) => ({
@@ -157,7 +169,20 @@ export default function CheckoutPage() {
         shippingAddress: `${formattedAddress}. Phone: ${data.mobileNumber}`,
       };
 
-      const res = await apiClient.post("/order", orderPayload);
+      let res;
+      try {
+        res = await apiClient.post("/order", orderPayload);
+      } catch (orderErr: any) {
+        const errMsg = orderErr?.response?.data?.details ||
+                       orderErr?.response?.data?.error ||
+                       orderErr?.response?.data?.message ||
+                       orderErr?.message ||
+                       'Failed to create order';
+        console.error('[CHECKOUT] Order creation failed:', errMsg, orderErr?.response?.data);
+        toast.error(`Order failed: ${errMsg}`);
+        return;
+      }
+
       const createdOrder = res.data;
 
       // Extract the order identifier
@@ -189,9 +214,10 @@ export default function CheckoutPage() {
               paymentSessionId = paymentData.paymentSessionId;
               redirectUrl = paymentData.redirectUrl;
               
-              const isSandbox = process.env.NEXT_PUBLIC_API_URL?.includes("sandbox") || 
-                                window.location.hostname === "localhost";
-              const paymentMode = isSandbox ? "sandbox" : "production";
+              // Use explicit env var for payment mode, fall back to hostname detection
+              const cashfreeMode = process.env.NEXT_PUBLIC_CASHFREE_MODE ||
+                (window.location.hostname === "localhost" ? "sandbox" : "production");
+              const paymentMode = cashfreeMode as "sandbox" | "production";
               
               if (redirectUrl) {
                 toast.success("Redirecting to payment gateway...");
@@ -223,8 +249,16 @@ export default function CheckoutPage() {
           } catch (payError: any) {
             console.error("Payment initiation failed:", payError);
             toast.dismiss("payment-init");
-            const errorMsg = payError.response?.data?.error || payError.response?.data?.message || payError.message;
-            toast.error(`Payment gateway initialization failed: ${errorMsg || "Please check credentials"}`);
+            const status = payError?.response?.status;
+            const errMsg = payError?.response?.data?.details ||
+                           payError?.response?.data?.error ||
+                           payError?.response?.data?.message ||
+                           payError?.message;
+            if (status === 503) {
+              toast.error("Online payment is currently unavailable. Please choose Cash on Delivery or contact support.");
+            } else {
+              toast.error(`Payment gateway error: ${errMsg || "Please try again or use Cash on Delivery"}`);
+            }
             return;
           }
         } else {
@@ -243,10 +277,10 @@ export default function CheckoutPage() {
             }
 
             toast.success("Opening payment gateway...");
-            const isSandbox = process.env.NEXT_PUBLIC_API_URL?.includes("sandbox") || 
-                              window.location.hostname === "localhost";
+            const cashfreeMode = process.env.NEXT_PUBLIC_CASHFREE_MODE ||
+              (window.location.hostname === "localhost" ? "sandbox" : "production");
             const cashfree = CashfreeSDK({
-              mode: isSandbox ? "sandbox" : "production",
+              mode: cashfreeMode as "sandbox" | "production",
             });
 
             cashfree.checkout({
@@ -261,9 +295,14 @@ export default function CheckoutPage() {
       toast.success(`Order placed successfully!`);
       clearCart();
       router.push(`/order-confirmation?orderId=${confirmationOrderId}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to place order:", error);
-      toast.error("Failed to place order. Please try again.");
+      const errMsg = error?.response?.data?.details ||
+                     error?.response?.data?.error ||
+                     error?.response?.data?.message ||
+                     error?.message ||
+                     "Please try again.";
+      toast.error(`Failed to place order: ${errMsg}`);
     } finally {
       setIsSubmitting(false);
     }

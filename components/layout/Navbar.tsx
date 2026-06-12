@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
@@ -29,6 +29,13 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Suppress cart/wishlist counts until after client hydration to prevent React #418 mismatch
+  useEffect(() => { setMounted(true); }, []);
+
+  const cartCount = mounted ? cartTotalItems : 0;
+  const wishlistCount = mounted ? wishlistTotalItems : 0;
 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const user = useAuthStore((s) => s.user);
@@ -111,12 +118,12 @@ export default function Navbar() {
               <Link
                 href="/wishlist"
                 className="relative rounded-full p-2 text-gray-900 dark:text-gray-300 transition-colors hover:text-[#9EFF00] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10"
-                aria-label={`Wishlist with ${wishlistTotalItems} items`}
+                aria-label={`Wishlist with ${wishlistCount} items`}
               >
                 <Heart className="h-5 w-5" />
-                {wishlistTotalItems > 0 && (
+                {wishlistCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#9EFF00] text-xs font-bold text-black">
-                    {wishlistTotalItems}
+                    {wishlistCount}
                   </span>
                 )}
               </Link>
@@ -125,12 +132,12 @@ export default function Navbar() {
               <Link
                 href="/cart"
                 className="relative rounded-full p-2 text-gray-900 dark:text-gray-300 transition-colors hover:text-[#9EFF00] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10"
-                aria-label={`Cart with ${cartTotalItems} items`}
+                aria-label={`Cart with ${cartCount} items`}
               >
                 <ShoppingCart className="h-5 w-5" />
-                {cartTotalItems > 0 && (
+                {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#9EFF00] text-xs font-bold text-black">
-                    {cartTotalItems}
+                    {cartCount}
                   </span>
                 )}
               </Link>
