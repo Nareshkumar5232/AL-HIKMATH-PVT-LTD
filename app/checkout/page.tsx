@@ -61,9 +61,11 @@ export default function CheckoutPage() {
   const clearCart = useCartStore((state) => state.clearCart);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shipping, setShipping] = useState<number>(0);
+  const [mounted, setMounted] = useState(false);
 
   // Fetch store settings for shipping fee on mount
   useEffect(() => {
+    setMounted(true);
     async function loadShipping() {
       try {
         const settings = await settingsService.getSettings();
@@ -92,6 +94,14 @@ export default function CheckoutPage() {
       router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
     }
   }, [user, router]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0F0F0F] pt-24 px-4 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#9EFF00]"></div>
+      </div>
+    );
+  }
 
   // Redirect if cart is empty
   if (cartItems.length === 0) {
