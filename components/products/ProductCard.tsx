@@ -70,14 +70,14 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
             </div>
           )}
           <Image
-            src={product.images[0] ?? "/file.svg"}
+            src={product.images[0] ?? "/images/placeholder-product.svg"}
             alt={product.name}
             width={280}
             height={280}
             loading="eager"
             className={`object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 ${imgLoaded ? '' : 'opacity-0'}`}
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = "/file.svg";
+              (e.currentTarget as HTMLImageElement).src = "/images/placeholder-product.svg";
             }}
             onLoad={() => setImgLoaded(true)}
           />

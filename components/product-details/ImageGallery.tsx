@@ -14,7 +14,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
   const [mainError, setMainError] = useState(false);
   const [mainLoaded, setMainLoaded] = useState(false);
 
-  const mainSrc = mainError ? "/file.svg" : images[activeIndex] ?? "/file.svg";
+  const mainSrc = mainError ? "/images/placeholder-product.svg" : images[activeIndex] ?? "/images/placeholder-product.svg";
 
   return (
     <div className="flex flex-col gap-4">
@@ -96,7 +96,7 @@ function ThumbnailButton({ src, alt, isActive, onClick }: ThumbnailButtonProps) 
         </div>
       )}
       <Image
-        src={error ? "/file.svg" : src}
+        src={error ? "/images/placeholder-product.svg" : src}
         alt={alt}
         width={80}
         height={80}

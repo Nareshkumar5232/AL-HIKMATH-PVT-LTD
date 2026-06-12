@@ -75,7 +75,7 @@ export default function CartClient() {
               >
                 <div className="w-24 h-24 bg-gray-100 dark:bg-black rounded-lg overflow-hidden shrink-0 relative transition-colors duration-300">
                   <Image
-                    src={item.product.images[0] ?? "/file.svg"}
+                    src={item.product.images[0] ?? "/images/placeholder-product.svg"}
                     alt={item.product.name}
                     fill
                     className="object-cover"

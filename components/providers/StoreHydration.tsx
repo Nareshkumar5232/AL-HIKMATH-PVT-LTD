@@ -6,10 +6,12 @@ import { useEffect } from "react";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useRecentlyViewedStore } from "@/store/recentlyViewedStore";
 import { useProductFilterStore } from "@/store/productFilterStore";
+import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
 
 /**
  * Triggers manual rehydration of persisted Zustand stores on client mount.
- * Both stores use `skipHydration: true` to avoid SSR mismatches, so this
+ * All persisted stores use `skipHydration: true` to avoid SSR mismatches, so this
  * component is responsible for kicking off hydration once the client is ready.
  */
 export function StoreHydration() {
@@ -17,6 +19,8 @@ export function StoreHydration() {
     useWishlistStore.persist.rehydrate();
     useRecentlyViewedStore.persist.rehydrate();
     useProductFilterStore.persist.rehydrate();
+    useCartStore.persist.rehydrate();
+    useAuthStore.persist.rehydrate();
   }, []);
   return null;
 }

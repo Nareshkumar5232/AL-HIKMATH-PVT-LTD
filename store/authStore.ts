@@ -50,6 +50,7 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: "al-hikmath-auth",
+      skipHydration: true,
     }
   )
 );

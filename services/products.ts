@@ -67,8 +67,9 @@ function buildBackendImageUrl(url: string | undefined): string {
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
   
   const cleanUrl = url.startsWith("/") ? url : `/${url}`;
-  const base = "https://al-kimath-backend.onrender.com";
-  return `${base}${cleanUrl}`;
+  const apiBase = (process.env.NEXT_PUBLIC_API_URL || "https://al-kimath-backend.onrender.com").replace(/\/+$/, "");
+  const host = apiBase.endsWith("/api") ? apiBase.slice(0, -4) : apiBase;
+  return `${host}${cleanUrl}`;
 }
 
 export interface ProductApiRecord {
