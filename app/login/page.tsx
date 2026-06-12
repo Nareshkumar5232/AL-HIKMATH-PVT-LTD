@@ -18,7 +18,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const params = useSearchParams();
   const redirect = params?.get("redirect") ?? "/";
@@ -74,6 +74,18 @@ export default function LoginPage() {
         <button type="submit" className="w-full py-3 bg-[#9EFF00] text-black rounded-lg font-bold">Sign in</button>
       </form>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <React.Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0F0F0F]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#9EFF00]"></div>
+      </div>
+    }>
+      <LoginContent />
+    </React.Suspense>
   );
 }
 

@@ -1,13 +1,39 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Package, Truck, Loader2, AlertCircle } from "lucide-react";
 import { apiClient } from "@/services/api";
 import { useCartStore } from "@/store/cartStore";
+import { toast } from "sonner";
 
-export default function OrderConfirmationPage() {
+// Helper to dynamically load Cashfree SDK script
+const loadCashfreeScript = (): Promise<any> => {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined") {
+      resolve(null);
+      return;
+    }
+    if ((window as any).Cashfree) {
+      resolve((window as any).Cashfree);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+    script.async = true;
+    script.onload = () => {
+      resolve((window as any).Cashfree);
+    };
+    script.onerror = () => {
+      console.error("Failed to load Cashfree SDK script");
+      resolve(null);
+    };
+    document.body.appendChild(script);
+  });
+};
+
+function OrderConfirmationContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId") || searchParams.get("order_id") || "";
   const clearCart = useCartStore((state) => state.clearCart);
@@ -16,6 +42,7 @@ export default function OrderConfirmationPage() {
   const [status, setStatus] = useState<"verifying" | "success" | "pending_verification" | "error">("verifying");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [orderData, setOrderData] = useState<any>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   useEffect(() => {
     if (!orderId) {
@@ -35,80 +62,101 @@ export default function OrderConfirmationPage() {
 
     const sessionId = searchParams.get("session_id") || "";
 
-    const verifyOnlinePayment = async () => {
-      try {
-        setStatus("verifying");
-        const verifyRes = await apiClient.post("/payment/verify", {
-          orderId,
-          paymentSessionId: sessionId,
-        });
-
-        const verifyData = verifyRes.data;
-        if (verifyData && (verifyData.status === "paided" || verifyData.status === "used")) {
-          if (isMounted) {
-            setStatus("success");
-            setLoading(false);
-          }
-        } else {
-          if (isMounted) {
-            setStatus("error");
-            setErrorMessage("Payment verification failed. Please check your bank transaction.");
-            setLoading(false);
-          }
-        }
-      } catch (err: any) {
-        console.error("Verification error:", err);
-        if (isMounted) {
-          setStatus("error");
-          setErrorMessage(err.message || "An error occurred while verifying payment.");
-          setLoading(false);
-        }
-      }
-    };
-
-    const checkOrderPaymentStatus = async () => {
+    const fetchOrderAndProceed = async () => {
       try {
         const response = await apiClient.get(`/order/${orderId}`);
         const order = response.data;
 
         if (!isMounted) return;
-
         setOrderData(order);
 
-        // Check if the order payment is Cash on Delivery
-        const isCOD = order.paymentMethod === "cod";
+        if (sessionId) {
+          // Verify online payment
+          try {
+            setStatus("verifying");
+            const verifyRes = await apiClient.post("/payment/verify", {
+              orderId,
+              paymentSessionId: sessionId,
+            });
 
-        if (isCOD) {
-          setStatus("success");
-          setLoading(false);
-          return;
+            const verifyData = verifyRes.data;
+            if (verifyData && (verifyData.status === "paided" || verifyData.status === "used")) {
+              if (isMounted) {
+                setStatus("success");
+                setLoading(false);
+              }
+            } else {
+              if (isMounted) {
+                setStatus("error");
+                setErrorMessage("Payment verification failed. Please check your bank transaction.");
+                setLoading(false);
+              }
+            }
+          } catch (err: any) {
+            console.error("Verification error:", err);
+            const errMsg = err?.response?.data?.details || err?.response?.data?.error || err.message || "An error occurred while verifying payment.";
+            if (isMounted) {
+              setStatus("error");
+              setErrorMessage(errMsg);
+              setLoading(false);
+            }
+          }
+        } else {
+          // No sessionId (e.g. COD or manual visit)
+          const isCOD = order.paymentMethod === "cod";
+          if (isCOD) {
+            setStatus("success");
+            setLoading(false);
+            return;
+          }
+
+          const isConfirmed = order.status !== "pending" && order.status !== "cancelled";
+          if (isConfirmed) {
+            setStatus("success");
+            setLoading(false);
+            return;
+          }
+
+          // If still pending, start polling
+          pollPaymentStatus();
         }
+      } catch (error: any) {
+        console.error("Error fetching order status:", error);
+        if (isMounted) {
+          setStatus("error");
+          setErrorMessage(error?.response?.data?.error || error.message || "Failed to load order details.");
+          setLoading(false);
+        }
+      }
+    };
 
-        // For online payment: check if status has updated from pending
-        // Any status other than pending and cancelled means payment/order is confirmed
+    const pollPaymentStatus = async () => {
+      try {
+        const response = await apiClient.get(`/order/${orderId}`);
+        const order = response.data;
+
+        if (!isMounted) return;
+        setOrderData(order);
+
         const isConfirmed = order.status !== "pending" && order.status !== "cancelled";
-
         if (isConfirmed) {
           setStatus("success");
           setLoading(false);
           return;
         }
 
-        // If still pending, poll again
         pollCount++;
         if (pollCount < maxPolls) {
-          timeoutId = setTimeout(checkOrderPaymentStatus, 2500);
+          timeoutId = setTimeout(pollPaymentStatus, 2500);
         } else {
-          // Spent too long waiting, show as pending verification
           setStatus("pending_verification");
           setLoading(false);
         }
       } catch (error) {
-        console.error("Error fetching order status:", error);
-        // If it's the first few polls, retry anyway, otherwise show error
+        console.error("Error polling order status:", error);
         pollCount++;
         if (pollCount < maxPolls) {
-          timeoutId = setTimeout(checkOrderPaymentStatus, 2500);
+          timeoutId = setTimeout(pollPaymentStatus, 2500);
         } else {
           if (isMounted) {
             setStatus("pending_verification");
@@ -118,17 +166,76 @@ export default function OrderConfirmationPage() {
       }
     };
 
-    if (sessionId) {
-      verifyOnlinePayment();
-    } else {
-      checkOrderPaymentStatus();
-    }
+    fetchOrderAndProceed();
 
     return () => {
       isMounted = false;
       if (timeoutId) clearTimeout(timeoutId);
     };
   }, [orderId, searchParams, clearCart]);
+
+  const handleRetryPayment = async () => {
+    if (!orderId || !orderData) return;
+    setIsRetrying(true);
+
+    try {
+      toast.loading("Initiating payment session...", { id: "payment-retry" });
+      
+      const paymentRes = await apiClient.post("/payment/process", {
+        orderId: orderId,
+        amount: orderData.total,
+        email: orderData.customerEmail,
+        customerName: orderData.customerName,
+      });
+
+      const paymentData = paymentRes.data;
+      toast.dismiss("payment-retry");
+
+      if (paymentData && paymentData.paymentSessionId) {
+        const paymentSessionId = paymentData.paymentSessionId;
+        const redirectUrl = paymentData.redirectUrl;
+
+        const cashfreeMode = process.env.NEXT_PUBLIC_CASHFREE_MODE || 
+          (window.location.hostname === "localhost" ? "sandbox" : "production");
+        const paymentMode = cashfreeMode as "sandbox" | "production";
+
+        if (redirectUrl) {
+          toast.success("Redirecting to payment gateway...");
+          window.location.href = redirectUrl;
+          return;
+        }
+
+        const CashfreeSDK = await loadCashfreeScript();
+        if (!CashfreeSDK) {
+          toast.error("Failed to load payment gateway SDK. Please try again.");
+          setIsRetrying(false);
+          return;
+        }
+
+        toast.success("Opening payment gateway...");
+        const cashfree = CashfreeSDK({
+          mode: paymentMode,
+        });
+
+        cashfree.checkout({
+          paymentSessionId,
+          redirectTarget: "_self"
+        });
+      } else {
+        throw new Error("Missing paymentSessionId in response");
+      }
+    } catch (payError: any) {
+      console.error("Payment retry failed:", payError);
+      toast.dismiss("payment-retry");
+      const errMsg = payError?.response?.data?.details ||
+                     payError?.response?.data?.error ||
+                     payError?.response?.data?.message ||
+                     payError?.message ||
+                     "Payment initiation failed. Please try again.";
+      toast.error(`Payment gateway error: ${errMsg}`);
+      setIsRetrying(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0F0F0F] pt-24 pb-16 flex items-center justify-center px-4">
@@ -191,9 +298,32 @@ export default function OrderConfirmationPage() {
               </div>
 
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Unable to Verify</h1>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-gray-600 dark:text-gray-400 mb-6 border-b border-gray-100 dark:border-white/5 pb-4">
                 {errorMessage || "We could not retrieve your order details at this moment."}
               </p>
+
+              {orderData && orderData.paymentMethod === "card" && orderData.status === "pending" && (
+                <div className="mb-6 bg-gray-50 dark:bg-[#1A1A1A] p-4 rounded-xl border border-gray-200 dark:border-white/6 text-left">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2">Did your payment fail?</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
+                    Your order was created but payment was not completed. You can safely retry payment now.
+                  </p>
+                  <button
+                    onClick={handleRetryPayment}
+                    disabled={isRetrying}
+                    className="w-full py-3 bg-[#9EFF00] text-black font-bold rounded-lg hover:bg-[#8FEE00] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isRetrying ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Initiating Payment...
+                      </>
+                    ) : (
+                      "Retry Payment"
+                    )}
+                  </button>
+                </div>
+              )}
             </>
           )}
 
@@ -256,6 +386,18 @@ export default function OrderConfirmationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0F0F0F] pt-24 px-4 flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-[#9EFF00] animate-spin" />
+      </div>
+    }>
+      <OrderConfirmationContent />
+    </Suspense>
   );
 }
 
