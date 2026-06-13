@@ -143,170 +143,152 @@ export default function CheckoutPage() {
     }
 
     setIsSubmitting(true);
+
+    // Build a shared address string and products array used by both paths
+    const formattedAddress = [
+      data.addressLine,
+      data.landmark,
+      data.city,
+      data.state,
+      data.pincode
+    ].filter(Boolean).join(", ");
+
+    const shippingAddress = `${formattedAddress}. Phone: ${data.mobileNumber}`;
+
+    const orderProducts = cartItems.map((item) => ({
+      productId: item.product.id,
+      productName: item.product.name,
+      quantity: item.quantity,
+      price: item.product.price,
+    }));
+
+    // Generate a stable orderId client-side — used for both COD and online paths
+    const generatedOrderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`;
+
     try {
-      // Map form details to backend expected body format
-      const formattedAddress = [
-        data.addressLine,
-        data.landmark,
-        data.city,
-        data.state,
-        data.pincode
-      ].filter(Boolean).join(", ");
+      // ── COD PATH ────────────────────────────────────────────────────────────
+      if (data.paymentMethod === "cod") {
+        const orderPayload = {
+          orderId: generatedOrderId,
+          customerId: user.id || undefined,
+          customerName: data.fullName,
+          customerEmail: user.email,
+          products: orderProducts,
+          total,
+          paymentMethod: "cod",
+          shippingAddress,
+        };
 
-      const orderPayload = {
-        customerId: user.id || undefined,
-        customerName: data.fullName,
-        customerEmail: user.email,
-        products: cartItems.map((item) => ({
-          productId: item.product.id,
-          productName: item.product.name,
-          quantity: item.quantity,
-          price: item.product.price,
-        })),
-        total,
-        status: "pending",
-        paymentMethod: data.paymentMethod === "online" ? "card" : "cod",
-        shippingAddress: `${formattedAddress}. Phone: ${data.mobileNumber}`,
-      };
+        let res;
+        try {
+          res = await apiClient.post("/order", orderPayload);
+        } catch (orderErr: any) {
+          const errMsg =
+            orderErr?.response?.data?.details ||
+            orderErr?.response?.data?.error ||
+            orderErr?.response?.data?.message ||
+            orderErr?.message ||
+            "Failed to create order";
+          console.error("[CHECKOUT] COD order creation failed:", errMsg);
+          toast.error(`Order failed: ${errMsg}`);
+          return;
+        }
 
-      let res;
-      try {
-        res = await apiClient.post("/order", orderPayload);
-      } catch (orderErr: any) {
-        const errMsg = orderErr?.response?.data?.details ||
-                       orderErr?.response?.data?.error ||
-                       orderErr?.response?.data?.message ||
-                       orderErr?.message ||
-                       'Failed to create order';
-        console.error('[CHECKOUT] Order creation failed:', errMsg, orderErr?.response?.data);
-        toast.error(`Order failed: ${errMsg}`);
+        const createdOrder = res.data;
+        const confirmationOrderId = createdOrder.id || generatedOrderId;
+
+        toast.success("Order placed successfully!");
+        clearCart();
+        router.push(`/order-confirmation?orderId=${confirmationOrderId}`);
         return;
       }
 
-      const createdOrder = res.data;
+      // ── ONLINE PAYMENT PATH ─────────────────────────────────────────────────
+      // Do NOT create an Order here. The Order is created server-side by
+      // verifyPayment after Cashfree confirms the payment is PAID.
+      toast.loading("Initiating payment session...", { id: "payment-init" });
 
-      // Extract the order identifier
-      const confirmationOrderId = createdOrder.id || createdOrder.orderId || createdOrder.order_id || `ORD-${Date.now()}`;
+      const paymentReqPayload = {
+        orderId: generatedOrderId,
+        amount: total,
+        email: user.email,
+        phone: data.mobileNumber,
+        customerName: data.fullName,
+        productInfo: cartItems.map((item) => item.product.name).join(", "),
+        // Full orderData — stored in Payment record, used to create Order after verification
+        customerId: user.id || undefined,
+        customerEmail: user.email,
+        products: orderProducts,
+        shippingAddress,
+      };
 
-      if (data.paymentMethod === "online") {
-        // If backend returned a direct redirect URL/payment link
-        let redirectUrl = createdOrder.paymentLink || createdOrder.payment_link || createdOrder.redirectUrl || createdOrder.redirect_url;
-        let paymentSessionId = createdOrder.paymentSessionId || createdOrder.payment_session_id || createdOrder.payment_session?.payment_session_id;
-
-        // If not returned by backend, initiate payment via backend payment process route
-        if (!redirectUrl && !paymentSessionId) {
-          try {
-            toast.loading("Initiating payment session...", { id: "payment-init" });
-            const paymentReqPayload = {
-              orderId: confirmationOrderId,
-              amount: total,
-              email: user.email,
-              phone: data.mobileNumber,
-              customerName: data.fullName,
-              productInfo: cartItems.map(item => item.product.name).join(", "),
-            };
-
-            const paymentRes = await apiClient.post("/payment/process", paymentReqPayload);
-            const paymentData = paymentRes.data;
-            toast.dismiss("payment-init");
-
-            if (paymentData && paymentData.paymentSessionId) {
-              paymentSessionId = paymentData.paymentSessionId;
-              redirectUrl = paymentData.redirectUrl;
-              
-              // Use explicit env var for payment mode, fall back to hostname detection
-              const cashfreeMode = process.env.NEXT_PUBLIC_CASHFREE_MODE ||
-                (window.location.hostname === "localhost" ? "sandbox" : "production");
-              const paymentMode = cashfreeMode as "sandbox" | "production";
-              
-              if (redirectUrl) {
-                toast.success("Redirecting to payment gateway...");
-                window.location.href = redirectUrl;
-                return;
-              }
-
-              if (paymentSessionId) {
-                const CashfreeSDK = await loadCashfreeScript();
-                if (!CashfreeSDK) {
-                  toast.error("Failed to load payment gateway. Please contact support.");
-                  return;
-                }
-
-                toast.success("Opening payment gateway...");
-                const cashfree = CashfreeSDK({
-                  mode: paymentMode,
-                });
-
-                cashfree.checkout({
-                  paymentSessionId,
-                  redirectTarget: "_self"
-                });
-                return;
-              }
-            } else {
-              throw new Error("Payment session initialization failed: missing paymentSessionId");
-            }
-          } catch (payError: any) {
-            console.error("Payment initiation failed:", payError);
-            toast.dismiss("payment-init");
-            const status = payError?.response?.status;
-            const errMsg = payError?.response?.data?.details ||
-                           payError?.response?.data?.error ||
-                           payError?.response?.data?.message ||
-                           payError?.message;
-            if (status === 503) {
-              toast.error("Online payment is currently unavailable. Please choose Cash on Delivery or contact support.");
-            } else {
-              toast.error(`Payment gateway error: ${errMsg || "Please try again or use Cash on Delivery"}`);
-            }
-            return;
-          }
+      let paymentData: any;
+      try {
+        const paymentRes = await apiClient.post("/payment/process", paymentReqPayload);
+        paymentData = paymentRes.data;
+        toast.dismiss("payment-init");
+      } catch (payError: any) {
+        toast.dismiss("payment-init");
+        const status = payError?.response?.status;
+        const errMsg =
+          payError?.response?.data?.details ||
+          payError?.response?.data?.error ||
+          payError?.response?.data?.message ||
+          payError?.message;
+        console.error("[CHECKOUT] Payment process failed:", errMsg, payError?.response?.data);
+        if (status === 503) {
+          toast.error(
+            "Online payment is currently unavailable. Please choose Cash on Delivery or contact support."
+          );
         } else {
-          // If backend did return redirection details directly
-          if (redirectUrl) {
-            toast.success("Redirecting to payment gateway...");
-            window.location.href = redirectUrl;
-            return;
-          }
-
-          if (paymentSessionId) {
-            const CashfreeSDK = await loadCashfreeScript();
-            if (!CashfreeSDK) {
-              toast.error("Failed to load payment gateway. Please contact support.");
-              return;
-            }
-
-            toast.success("Opening payment gateway...");
-            const cashfreeMode = process.env.NEXT_PUBLIC_CASHFREE_MODE ||
-              (window.location.hostname === "localhost" ? "sandbox" : "production");
-            const cashfree = CashfreeSDK({
-              mode: cashfreeMode as "sandbox" | "production",
-            });
-
-            cashfree.checkout({
-              paymentSessionId,
-              redirectTarget: "_self"
-            });
-            return;
-          }
+          toast.error(
+            `Payment gateway error: ${errMsg || "Please try again or use Cash on Delivery"}`
+          );
         }
+        return;
       }
 
-      toast.success(`Order placed successfully!`);
-      clearCart();
-      router.push(`/order-confirmation?orderId=${confirmationOrderId}`);
+      const paymentSessionId = paymentData?.paymentSessionId || paymentData?.cashfreePaymentSessionId;
+
+      if (!paymentSessionId) {
+        toast.error("Payment session initialization failed. Please try again.");
+        console.error("[CHECKOUT] Missing paymentSessionId in processPayment response:", paymentData);
+        return;
+      }
+
+      // Load Cashfree SDK and open checkout
+      const CashfreeSDK = await loadCashfreeScript();
+      if (!CashfreeSDK) {
+        toast.error("Failed to load payment gateway. Please contact support.");
+        return;
+      }
+
+      const cashfreeMode = (process.env.NEXT_PUBLIC_CASHFREE_MODE ||
+        (window.location.hostname === "localhost" ? "sandbox" : "production")) as "sandbox" | "production";
+
+      toast.success("Opening payment gateway...");
+      const cashfree = CashfreeSDK({ mode: cashfreeMode });
+      cashfree.checkout({ paymentSessionId, redirectTarget: "_self" });
+      // Page navigates away — no code runs after this point
+      // Cart is intentionally NOT cleared here; it is cleared on /order-confirmation
+      // to protect against mid-payment abandonment.
+
     } catch (error: any) {
       console.error("Failed to place order:", error);
-      const errMsg = error?.response?.data?.details ||
-                     error?.response?.data?.error ||
-                     error?.response?.data?.message ||
-                     error?.message ||
-                     "Please try again.";
+      const errMsg =
+        error?.response?.data?.details ||
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Please try again.";
       toast.error(`Failed to place order: ${errMsg}`);
     } finally {
       setIsSubmitting(false);
     }
   }
+
+
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0F0F0F] pt-24 pb-16">

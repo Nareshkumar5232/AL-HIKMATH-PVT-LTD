@@ -63,63 +63,88 @@ function OrderConfirmationContent() {
     const sessionId = searchParams.get("session_id") || "";
 
     const fetchOrderAndProceed = async () => {
+      if (sessionId) {
+        // ── ONLINE PAYMENT PATH ──────────────────────────────────────────────
+        // The Order is created server-side by verifyPayment after confirming PAID.
+        // Do NOT fetch the order first — it may not exist yet.
+        try {
+          setStatus("verifying");
+          const verifyRes = await apiClient.post("/payment/verify", {
+            orderId,
+            paymentSessionId: sessionId,
+          });
+
+          const verifyData = verifyRes.data;
+          if (verifyData && (verifyData.status === "paid" || verifyData.status === "used")) {
+            if (isMounted) {
+              // verifyPayment returns the created/confirmed Order — use it directly
+              if (verifyData.order) {
+                setOrderData(verifyData.order);
+              }
+              setStatus("success");
+              setLoading(false);
+            }
+          } else {
+            if (isMounted) {
+              setStatus("error");
+              setErrorMessage("Payment verification failed. Please check your bank transaction.");
+              setLoading(false);
+            }
+          }
+        } catch (err: any) {
+          console.error("Verification error:", err);
+          const errMsg =
+            err?.response?.data?.details ||
+            err?.response?.data?.error ||
+            err?.message ||
+            "An error occurred while verifying payment.";
+          if (isMounted) {
+            setStatus("error");
+            setErrorMessage(errMsg);
+            setLoading(false);
+          }
+        }
+        return;
+      }
+
+      // ── COD / DIRECT VISIT PATH ────────────────────────────────────────────
+      // Retry up to 3 times with 1s delay (COD orders are confirmed on creation
+      // but network/DB latency may cause a brief 404 window after redirect).
       try {
-        const response = await apiClient.get(`/order/${orderId}`);
-        const order = response.data;
+        let order: any = null;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            const response = await apiClient.get(`/order/${orderId}`);
+            order = response.data;
+            break;
+          } catch (err: any) {
+            if (err?.response?.status === 404 && attempt < 2) {
+              await new Promise((r) => setTimeout(r, 1000));
+            } else {
+              throw err;
+            }
+          }
+        }
 
         if (!isMounted) return;
         setOrderData(order);
 
-        if (sessionId) {
-          // Verify online payment
-          try {
-            setStatus("verifying");
-            const verifyRes = await apiClient.post("/payment/verify", {
-              orderId,
-              paymentSessionId: sessionId,
-            });
-
-            const verifyData = verifyRes.data;
-            if (verifyData && (verifyData.status === "paid" || verifyData.status === "used")) {
-              if (isMounted) {
-                setStatus("success");
-                setLoading(false);
-              }
-            } else {
-              if (isMounted) {
-                setStatus("error");
-                setErrorMessage("Payment verification failed. Please check your bank transaction.");
-                setLoading(false);
-              }
-            }
-          } catch (err: any) {
-            console.error("Verification error:", err);
-            const errMsg = err?.response?.data?.details || err?.response?.data?.error || err.message || "An error occurred while verifying payment.";
-            if (isMounted) {
-              setStatus("error");
-              setErrorMessage(errMsg);
-              setLoading(false);
-            }
-          }
-        } else {
-          // No sessionId (e.g. COD or manual visit)
-          const isCOD = order.paymentMethod === "cod";
-          if (isCOD) {
-            setStatus("success");
-            setLoading(false);
-            return;
-          }
-
-          const isConfirmed = order.status !== "pending" && order.status !== "cancelled";
-          if (isConfirmed) {
-            setStatus("success");
-            setLoading(false);
-            return;
-          }
-
-          // If still pending, start polling
-          pollPaymentStatus();
+        const isCOD = order.paymentMethod === "cod";
+        if (isCOD) {
+          setStatus("success");
+          setLoading(false);
+          return;
         }
+
+        const isConfirmed = order.status !== "pending" && order.status !== "cancelled";
+        if (isConfirmed) {
+          setStatus("success");
+          setLoading(false);
+          return;
+        }
+
+        // If still pending, start polling (legacy online orders)
+        pollPaymentStatus();
       } catch (error: any) {
         console.error("Error fetching order status:", error);
         if (isMounted) {
@@ -129,6 +154,7 @@ function OrderConfirmationContent() {
         }
       }
     };
+
 
     const pollPaymentStatus = async () => {
       try {
