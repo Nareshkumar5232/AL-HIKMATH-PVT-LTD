@@ -80,7 +80,7 @@ function OrderConfirmationContent() {
             });
 
             const verifyData = verifyRes.data;
-            if (verifyData && (verifyData.status === "paided" || verifyData.status === "used")) {
+            if (verifyData && (verifyData.status === "paid" || verifyData.status === "used")) {
               if (isMounted) {
                 setStatus("success");
                 setLoading(false);
@@ -178,6 +178,13 @@ function OrderConfirmationContent() {
     if (!orderId || !orderData) return;
     setIsRetrying(true);
 
+    // BUG FIX #7: Extract phone from shippingAddress (format: "..., Phone: XXXXXXXXXX")
+    const extractPhone = (address: string): string => {
+      const match = address?.match(/Phone:\s*([6-9]\d{9})/);
+      return match ? match[1] : "";
+    };
+    const phone = extractPhone(orderData.shippingAddress || "");
+
     try {
       toast.loading("Initiating payment session...", { id: "payment-retry" });
       
@@ -185,7 +192,9 @@ function OrderConfirmationContent() {
         orderId: orderId,
         amount: orderData.total,
         email: orderData.customerEmail,
+        phone,
         customerName: orderData.customerName,
+        productInfo: `Retry for order ${orderId}`,
       });
 
       const paymentData = paymentRes.data;
